@@ -56,4 +56,4 @@ Nous avons également implémenté une Web Application avec *Dash* pour permettr
 
 
 
-Les temps de calcul obtenus lors de nos essais tournent autour de 30 secondes pour les petites instances et autour de 5 minutes pour les plus difficiles.
+Les temps de calcul obtenus lors de nos essais tournent autour de 2 secondes pour les petites instances et autour de 5 minutes pour les plus difficiles.
