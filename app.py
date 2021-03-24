@@ -124,7 +124,7 @@ html.Div(
                 ),
 
         html.P(
-                dcc.Markdown( "Sélectionnez la date pour laquelle vous voulez régarder la solution ci-dessous: "),
+                dcc.Markdown( "Sélectionnez la date pour laquelle vous voulez regarder la solution ci-dessous : "),
                 style={
                     'fontSize': 18,
                     'color': 'black',
