@@ -49,6 +49,10 @@ Nous avons également implémenté une Web Application avec *Dash* pour permettr
 
 
 
+![preview_webapp](assets/preview_webapp.png)
+
+
+
 ## Evaluation des performances de l'algorithme proposé
 
 - Pour le critère de certificat d'optimalité, les résultats pour chaque instance sont automatiquement enregistrées dans le dossier `output`
@@ -56,4 +60,4 @@ Nous avons également implémenté une Web Application avec *Dash* pour permettr
 
 
 
-Les temps de calcul obtenus lors de nos essais tournent autour de 2 secondes pour les petites instances et autour de 5 minutes pour les plus difficiles.
+Les temps de calcul obtenus lors de nos essais tournent autour de 2 secondes pour les petites instances et autour de 2 minutes pour les plus difficiles (sur nos ordinateurs portables).

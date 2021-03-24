@@ -313,4 +313,4 @@ def update_bar_chart(value):
     fig.add_layout_image(avion['background']) 
     return fig
 
-app.run_server(debug=True)
+app.run_server(debug=False)
