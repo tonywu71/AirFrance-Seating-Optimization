@@ -21,7 +21,7 @@ def get_list_dates_input():
         ans = re.findall(pattern=pattern, string=filename)
 
         if len(ans) == 1: # Sanity check pour vérifier qu'on a bien une solution...
-            list_dates.append(ans[0][0])
+            list_dates.append(ans[0])
 
     # Test pour vérifier si on arrive ou non à récupérer des données
     assert len(list_dates) != 0, 'Pas de données correctes trouvées dans le dossier "data" !'

@@ -24,7 +24,7 @@ app = dash.Dash(__name__)
 
 
 ## ------ Obtention de la liste des fichiers en entrée ------
-
+list_dates = get_list_dates_input()
 
 
 
@@ -47,16 +47,18 @@ avion_dropdown = dcc.Dropdown(
 date_dropdown = dcc.Dropdown(
         id='date-dropdown',
         options=[
-            {'label': f"{date} - {avion}", 'value': f"{date}_{avion}"} for date, avion in dates_avion.items()
+            {'label': date, 'value': date} for date in list_dates
         ],
-        value=f"{list_dates[0]}_{dates_avion[list_dates[0]]}" # on choisit d'avoir par défaut la 1ère date trouvée
+        value=list_dates[0] # on choisit d'avoir par défaut la 1ère date trouvée
     )
 
 
 
-## ------ Layout ------
 
-app.layout = html.Div([
+## ------ Building blocks for Layout ------
+
+# Banderolle de présentation du projet:
+div_header = html.Div([
     html.Div(
         [
             html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title", style = {'color': '#990000', 'text-align':'center'}),
@@ -110,11 +112,14 @@ app.layout = html.Div([
         
         style={"padding": "10px"}
         
-    ),
-        
-    # Sélection de date
+    )
+])
+
+
+# Sélection de date:
+div_date = html.Div([
     html.P(
-            dcc.Markdown( "Sélectionnez la date pour de l'instance à charger : "),
+            dcc.Markdown( "Sélectionnez la date pour l'instance à charger : "),
             style={
                 'fontSize': 18,
                 'color': 'black',
@@ -122,10 +127,11 @@ app.layout = html.Div([
             },
             className="app__header__title--grey",
         ),   
-    date_dropdown,
+    date_dropdown
+])
 
-
-    # Sélection de l'avion
+# Sélection de l'avion:
+div_avion = html.Div([
     html.P(
             dcc.Markdown( "Sélectionnez un avion: "),
             style={
@@ -138,11 +144,35 @@ app.layout = html.Div([
     avion_dropdown
 ])
 
+
+
+
+## ------ Defining Layout ------
+app.layout = html.Div([
+    div_header, # Banderolle de présentation du projet
+
+    div_date, # Sélection de date
+    div_avion, # Sélection de l'avion
+
+    html.Button('Valider', id='button-valider', n_clicks=0),
+
+    dcc.Textarea(
+        id='textarea-debug',
+        value='0'
+    )
+])
+
+
+
+
+
+
+
 @app.callback(
-    Output("scatter-plot", "figure"), 
-    [Input("date-dropdown", "value"), Input("avion-dropdown", "value")])
-def update_bar_chart(value):
-    return
+    Output("textarea-debug", "value"), 
+    [Input("button-valider", "n_clicks"), Input("date-dropdown", "value"), Input("avion-dropdown", "value")])
+def debug(n_clicks, date, avion):
+    return f"{n_clicks}, {date}, {avion}"
 
     
 app.run_server(debug=True)
