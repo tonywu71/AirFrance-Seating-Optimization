@@ -1,3 +1,5 @@
+## ------ Dash application for visualizing solutions to the static problem ------
+
 import os
 import json
 import re
@@ -11,7 +13,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
 
-from utils import *
+from utils_static import *
 
 
 app = dash.Dash(__name__)
