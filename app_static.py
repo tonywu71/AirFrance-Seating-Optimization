@@ -35,7 +35,7 @@ for filename in os.listdir('output'):
         dates_avion[date] = avion
 
 # Test pour vérifier si on arrive ou non à récupérer des données
-assert len(dates_avion) != 0, "Pas de données correctes trouvées dans le dossier data !"
+assert len(dates_avion) != 0, 'Pas de données correctes trouvées dans le dossier "output" !'
 
 # On extrait les clés du dictionnaire dates_avion pour lire plus facilement les dates:
 list_dates = list(dates_avion.keys())

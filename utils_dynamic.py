@@ -1,8 +1,69 @@
 import numpy as np
+import re
 
 from utils_static import *
 
 
+# TODO pour l'avion
+# args: liste_groupes, liste_passagers, poids, top_left_corner
+
+def get_list_dates_input():
+    """Renvoie la liste des dates des instances fournies dans le dossier "data".
+    """
+
+    pattern = '^data_seating_([a-zA-Z0-9]*).csv$'
+
+    # dates_avion est undictionnaire dont les clés sont les dates des instances et
+    # dont les clés sont des string donnant l'avion choisi
+    list_dates = []
+
+    for filename in os.listdir('data'):
+        ans = re.findall(pattern=pattern, string=filename)
+
+        if len(ans) == 1: # Sanity check pour vérifier qu'on a bien une solution...
+            list_dates.append(ans[0][0])
+
+    # Test pour vérifier si on arrive ou non à récupérer des données
+    assert len(list_dates) != 0, 'Pas de données correctes trouvées dans le dossier "data" !'
+
+    return list_dates
+
+
+
+
+
+## ----- Classes -----
+class Avion:
+    """
+    Une classe représentant un avion donné avec ses placements déjà réalisés.
+    """
+
+    def __init__(self, ref_avion, placements={}):
+        """Constructeur pour la classe Avion.
+
+        Args:
+            ref_avion (string): "A320" ou "A321"
+            placements (dict, optional): de la forme {id_passager: (x_place, y_palce)}.
+        """
+        
+        self.ref_avion = ref_avion
+        self.placements = placements
+
+    def __str__(self):
+        return f'Avion #{self.ref_avion} avec {len(self.placements)} passager(s) déjà placés.'
+
+    def __repr__(self):
+        return f'avion #{self.ref_avion} - {len(self.placements)} passager(s) placés'
+    
+    def is_seat_free(self, place):
+        """Renvoie True si et seulement si la place donnée en entrée n'est pas déjà
+        occupée.
+        """
+        return not (place in self.placements)
+
+
+
+## ----- Autres utilitaires -----
 def groupe_generator(liste_groupes):
     """Générateur pour parcourir simplement tous les groupes d'une instance
     de manière aléatoire
@@ -64,12 +125,3 @@ def update_avion(avion, groupe, id_passager, place_choisie):
     # TODO
 
     return avion
-
-
-
-# TODO
-avion = {place: id_passager}
-if place not in poids:
-    # ça veut dire que la place est libre
-
-placements = {id_passager: place}
