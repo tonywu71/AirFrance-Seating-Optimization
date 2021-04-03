@@ -167,6 +167,20 @@ class Groupe:
 
 
 ## ------- Utilitaires pour les classes -------
+def string_to_min(date):
+    
+    """
+    Fonction qui transforme une heure au format HH:MM:SS 
+    en l'entier correspondant au nombre de minutes de cette dernière.
+    """
+    
+    hms = date.split(":")
+    if date == "00:00:00":
+        return float('inf')
+    else:
+        return int(60*int(hms[0]) + int(hms[1]) + int(hms[2])*50/3)
+
+
 def get_list_groupes(df):
     """Renvoie une liste qui à chaque index de groupe
     renvoie un objet Groupe donnant sa composition.

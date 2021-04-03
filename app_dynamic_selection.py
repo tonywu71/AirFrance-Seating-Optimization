@@ -18,42 +18,19 @@ from utils_dynamic import *
 
 
 
-
 app = dash.Dash(__name__)
 
 
 
-## ------ Obtention de la liste des fichiers en entrée ------
+
+
+# TESTING PURPOSES
 list_dates = get_list_dates_input()
+date = "7Nov"
+AVION = "A321"
 
-
-
-
-
-
-## ------ Widgets ------
-
-# Sélecteur d'avion :
-avion_dropdown = dcc.Dropdown(
-        id='avion-dropdown',
-        options=[
-            {'label': "A320", 'value': "A320"},
-            {'label': "A321", 'value': "A321"}
-        ],
-        value="A321" # on choisit d'avoir par défaut la 1ère date trouvée
-    )
-
-# Sélecteur de date :
-date_dropdown = dcc.Dropdown(
-        id='date-dropdown',
-        options=[
-            {'label': date, 'value': date} for date in list_dates
-        ],
-        value=list_dates[0] # on choisit d'avoir par défaut la 1ère date trouvée
-    )
-
-
-
+fig = get_plane_config_graph(date, AVION)
+listeGroupes, listePassagers = get_config_instance(date)
 
 ## ------ Building blocks for Layout ------
 
@@ -116,52 +93,45 @@ div_header = html.Div([
 ])
 
 
-# Sélection de date:
-div_date = html.Div([
-    html.P(
-            dcc.Markdown( "Sélectionnez la date pour l'instance à charger : "),
-            style={
-                'fontSize': 18,
-                'color': 'black',
-                'text-align': 'left'
-            },
-            className="app__header__title--grey",
-        ),   
-    date_dropdown
-])
 
-# Sélection de l'avion:
-div_avion = html.Div([
-    html.P(
-            dcc.Markdown( "Sélectionnez un avion: "),
-            style={
-                'fontSize': 18,
-                'color': 'black',
-                'text-align': 'left'
-            },
-            className="app__header__title--grey",
-        ),   
-    avion_dropdown
-])
+# Textbox pour débugger :
+debug_textbox = html.Div([
+            dcc.Markdown("""
+                **Click Data**
+
+                Click on points in the graph.
+            """),
+            html.Pre(id='click-data')
+        ], className='three columns')
 
 
+# Bouton de confirmation du choix de la place :
+confirm_button = html.Button('Valider', id='confirm-button', type='submit', disabled=True)
+
+
+
+
+slider_progress = dcc.Slider(
+    id="slider-progress",
+    min=0,
+    max=9,
+    marks={i: 'Label {}'.format(i) for i in range(10)},
+    value=5,
+)  
 
 
 ## ------ Defining Layout ------
 app.layout = html.Div([
     div_header, # Banderolle de présentation du projet
 
-    div_date, # Sélection de date
-    div_avion, # Sélection de l'avion
-
-    html.Button('Valider', id='button-valider', n_clicks=0),
-
-    dcc.Textarea(
-        id='textarea-debug',
-        value='0'
-    )
+    dcc.Graph(
+        id="scatter-plot",
+        figure=fig,
+        config={"displayModeBar": False, "showTips": False}
+        ),
+    debug_textbox,
+    confirm_button
 ])
-
 
 
 
@@ -169,10 +139,16 @@ app.layout = html.Div([
 
 
 @app.callback(
-    Output("textarea-debug", "value"), 
-    [Input("button-valider", "n_clicks"), Input("date-dropdown", "value"), Input("avion-dropdown", "value")])
-def debug(n_clicks, date, avion):
-    return f"{n_clicks}, {date}, {avion}"
+    Output('click-data', 'children'),
+    Input('scatter-plot', 'clickData'))
+def display_click_data(clickData):
+    return json.dumps(clickData, indent=2)
+
+@app.callback(
+    Output('confirm-button', 'disabled'),
+    Input('scatter-plot', 'clickData'))
+def is_point_selected(clickData):
+    return clickData is None
 
     
 app.run_server(debug=True)

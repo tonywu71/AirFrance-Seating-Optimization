@@ -1,5 +1,9 @@
 import numpy as np
 import re
+import json
+
+import plotly.express as px
+import plotly.graph_objects as go
 
 from utils_static import *
 
@@ -29,7 +33,101 @@ def get_list_dates_input():
     return list_dates
 
 
+def get_config_instance(date):
+    """Renvoie pour une date et un avion donné la liste des groupes
+    et la liste des passagers de l'instance en question.
+    """
+    ## --- Lecture du CSV ---
+    filename = f'data_seating_{date}.csv'
+    df_instance = pd.read_csv(os.path.join('data', filename))
 
+    listeGroupes = get_list_groupes(df_instance)
+    listePassagers = get_list_passagers(df_instance)
+
+    return listeGroupes, listePassagers
+
+
+def get_plane_config_graph(date, AVION):
+    ## --- Lecture du CSV ---
+    filename = f'solution_{date}_{AVION}.csv'
+    df_ans = pd.read_csv(os.path.join('output', filename))
+    
+
+    ## --- Calcul du barycentre depuis df_ans directement
+    barycentre_x, barycentre_y = calcul_barycentre(df_ans)
+
+    ## --- Récupération des marqueurs pour le tracé dans Plotly
+    marker_list = get_markers_passagers(df_ans)
+
+    ## --- Récupération de certaines métadonnées nécessaire à Plotly
+    with open('./'+AVION+'.json') as f:
+        preprocess = json.load(f)
+    
+    avion = {
+        'x_max': preprocess['x_max'],
+        'y_max': preprocess['y_max'],
+        'exit': preprocess['exit'],
+        'hallway': preprocess['hallway'],
+        'barycentre': preprocess['barycentre'],
+        'background': preprocess['background'],
+        'seats': {
+            'real': [],
+            'fictive': [],
+            'business': [],
+            'exit': [],
+            'eco': []        
+        }
+    }
+
+
+    ## --- Plot de la figure avec Plotly ---
+    fig = px.scatter(
+        df_ans,
+        x='x',
+        y='y',
+        hover_name='Siège',
+        color= 'ID Groupe',
+        size='Poids',
+        hover_data=df_ans.columns,
+        template="plotly_white",
+        color_continuous_scale=px.colors.diverging.RdBu)
+
+    
+
+    fig.update_traces(marker=dict(line=dict(width=2, color='black')),
+                    marker_symbol=marker_list,
+                    selector=dict(mode='markers'))
+
+    ## Ajout du barycentre
+    fig.add_trace(
+        go.Scatter(x=[barycentre_x],
+                y=[barycentre_y],
+                name="Barycentre",
+                showlegend=False,
+                marker_symbol=["star-triangle-up-dot"],
+                mode="markers",
+                marker=dict(size=20,
+                            color="green",
+                            line=dict(width=2, color='DarkSlateGrey'))))
+
+    fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
+
+
+    # Positionnement de la légende
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ))
+
+    # Add images
+    fig.add_layout_image(avion['background']) 
+
+    # Permet de mettre en surbrillance uniquement le point sélectionné
+    fig.update_layout(clickmode='event+select')
+    return fig
 
 
 ## ----- Classes -----
