@@ -141,7 +141,7 @@ class Avion:
 
         Args:
             ref_avion (string): "A320" ou "A321"
-            placements (dict, optional): de la forme {id_passager: (x_place, y_palce)}.
+            placements (dict, optional): de la forme {id_passager: (x_place, y_place)}.
         """
         
         self.ref_avion = ref_avion

@@ -20,7 +20,7 @@ from utils_dynamic import *
 
 app = dash.Dash(__name__)
 
-
+placements = dict()
 
 
 
@@ -30,7 +30,12 @@ date = "7Nov"
 AVION = "A321"
 
 fig = get_plane_config_graph(date, AVION)
-listeGroupes, listePassagers = get_config_instance(date)
+# listeGroupes, listePassagers = get_config_instance(date)
+
+
+
+idx_groupe_courrant = 0
+
 
 ## ------ Building blocks for Layout ------
 
@@ -111,13 +116,14 @@ confirm_button = html.Button('Valider', id='confirm-button', type='submit', disa
 
 
 
-slider_progress = dcc.Slider(
-    id="slider-progress",
-    min=0,
-    max=9,
-    marks={i: 'Label {}'.format(i) for i in range(10)},
-    value=5,
-)  
+# slider_progress = dcc.Slider(
+#     id="slider-progress",
+#     min=0,
+#     max=len(listeGroupes),
+#     marks={i: 'Groupe {}'.format(i) for i in range(10)},
+#     value=idx_groupe_courrant,
+#     disabled=True
+# )  
 
 
 ## ------ Defining Layout ------
@@ -149,6 +155,7 @@ def display_click_data(clickData):
     Input('scatter-plot', 'clickData'))
 def is_point_selected(clickData):
     return clickData is None
+
 
     
 app.run_server(debug=True)
