@@ -38,8 +38,7 @@ def get_config_instance(date):
     et la liste des passagers de l'instance en question.
     """
     ## --- Lecture du CSV ---
-    filename = f'data_seating_{date}.csv'
-    df_instance = pd.read_csv(os.path.join('data', filename))
+    df_instance = read_and_preprocess(date)
 
     listeGroupes = get_list_groupes(df_instance)
     listePassagers = get_list_passagers(df_instance)
@@ -174,10 +173,10 @@ def groupe_generator(liste_groupes):
     """
     while len(liste_groupes) != 0:
         n = len(liste_groupes)
-        groupe_courrant = liste_groupes.pop(np.random.randint(0, n))
+        groupe_courant = liste_groupes.pop(np.random.randint(0, n))
         # NB : np.random.randint renvoie un nombre entre 0 et n exlus
 
-        yield groupe_courrant
+        yield groupe_courant
 
 
 

@@ -31,7 +31,13 @@ def get_filepath(date, data_source='data'):
 
 
 ## ------- Classes -------
+# Initialisation de compteurs
 
+numPassager = 0
+numFemme = 0
+numHomme = 0
+numEnfant = 0
+numWHCR = 0
 class Passager:
     
     """
@@ -168,7 +174,6 @@ class Groupe:
 
 ## ------- Utilitaires pour les classes -------
 def string_to_min(date):
-    
     """
     Fonction qui transforme une heure au format HH:MM:SS 
     en l'entier correspondant au nombre de minutes de cette dernière.
