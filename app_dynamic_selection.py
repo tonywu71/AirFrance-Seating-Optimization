@@ -138,7 +138,7 @@ sliders_container = html.Div([
         id="slider-groupe",
         min=0,
         max=len(listeGroupes),
-        marks={idx: f'{idx}'for idx in range(len(listeGroupes))},
+        marks={idx: f'{idx}'for idx in range(len(listeGroupes))  if idx % 10 == 0},
         value=idx_groupe_courant, # vaut 0 a priori au lancement
         disabled=True
     ),
@@ -151,7 +151,7 @@ sliders_container = html.Div([
         id="slider-passager",
         min=0,
         max=len(listeGroupes[idx_groupe_courant].list_passagers),
-        marks={idx: f'Passager {passager.idx}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
+        marks={idx: f'Passager {passager.idx}' for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
         value=idx_passager_courant, # vaut 0 a priori au lancement
         disabled=True
     )
