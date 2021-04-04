@@ -83,6 +83,10 @@ def get_place_proposees_figure(places_proposees, AVION):
 
     # Permet de mettre en surbrillance uniquement le point sélectionné
     fig.update_layout(clickmode='event+select')
+
+    # Désactive la possibilité de zoomer
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
     return fig
 
 
@@ -172,3 +176,10 @@ def update_avion(avion, groupe, id_passager, place_choisie):
     # TODO
 
     return avion
+
+def placements_to_json(placements):
+    """Utilitaire pour avoir un dictionnaire avec des strings et non des tuples.
+    Permet de debug.
+    """
+    placements_new = {f"({str(key[0])}, {str(key[1])})": f"({str(val[0])}, {str(val[1])})" for key, val in placements.items()}
+    return json.dumps(placements_new, indent=2)

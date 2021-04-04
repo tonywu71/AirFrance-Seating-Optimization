@@ -46,12 +46,11 @@ idx_groupe_courant = 0
 groupe_courant = listeGroupes[idx_groupe_courant]
 
 # idem mais avec l'index du passager
-idx_passager_courant = 0c
+idx_passager_courant = 0
 
-# Récupération des données liées à la configuration de l'avion
+# Récupération des données issues de la première itération
 places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
 fig = get_place_proposees_figure(places_proposees, AVION)
-
 
 
 
@@ -120,12 +119,13 @@ div_header = html.Div([
 
 
 # Textbox pour débugger :
-debug_textbox = html.Div([
+debug_clickData = html.Div([
             dcc.Markdown("""
                 **Click Data**
 
                 Click on points in the graph.
             """),
+
             html.Pre(id='click-data')
         ], className='three columns')
 
@@ -162,11 +162,26 @@ sliders_container = html.Div([
     )
 ])
 
+# Figure Plotly où on sélectionnera les places pour chaque passager :
 scatter_plot = dcc.Graph(
         id="scatter-plot",
         figure=fig,
         config={"displayModeBar": False, "showTips": False}
         )
+
+
+# Component de debug pour afficher les infos du point sélectionné :
+debug_clickData = html.Div([
+            dcc.Markdown("""
+                **Click Data**
+
+                Click on points in the graph.
+            """),
+
+            html.Pre(id='click-data')
+        ], className='three columns')
+
+debug_placements = html.Pre(id='debug-placements')
 
 
 ## ------ Defining Layout ------
@@ -178,9 +193,10 @@ app.layout = html.Div([
             """),
 
     scatter_plot,
-    debug_textbox,
+    debug_clickData,
     confirm_button,
-    sliders_container
+    sliders_container,
+    debug_placements
 ])
 
 
@@ -209,16 +225,15 @@ def is_point_selected(clickData):
         Output('slider-passager', 'max'),
         # Output('slider-passager', 'marks'),
         Output('slider-groupe', 'value'),
-        Output('scatter-plot', 'figure')
+        Output('scatter-plot', 'figure'),
+        Output('debug-placements', 'children')
     ],
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
 def confirm_action(n_clicks, clickData):
-    global idx_groupe_courant, historique_groupes, idx_passager_courant, date, AVION
+    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION
 
     if n_clicks is not None:
-        print("n_clicks is not None")
-        
         idx_passager_courant += 1 # idx_groupe_courant est une variable globale
         
 
@@ -238,7 +253,7 @@ def confirm_action(n_clicks, clickData):
 
 
     else:
-        print("else")
+        places_proposees
         pass
     
     # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
@@ -250,7 +265,11 @@ def confirm_action(n_clicks, clickData):
     marks_slider_passager = {idx: f'Passager {str(passager.idx)}' for idx, passager in enumerate(listePassagers_courant)},
     # NB: On profite de regénérer la figure pour désélectionner le point précédent !
 
-    return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig
+    # Mise à jour du dictionnaire placements :
+    placements[idx_groupe_courant, idx_passager_courant] = places_proposees
+    placements_json = placements_to_json(placements)
+
+    return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json
 
     
 app.run_server(debug=True)
