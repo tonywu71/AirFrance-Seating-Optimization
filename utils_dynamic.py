@@ -73,8 +73,7 @@ def get_place_proposees_figure(places_proposees, AVION):
     ## --- Plot de la figure avec Plotly ---
     fig = px.scatter(
         x= [element[0] for element in places_proposees],
-        y= [element[1] for element in places_proposees],
-        color = 'green'
+        y= [element[1] for element in places_proposees]
     )
 
     
