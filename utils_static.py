@@ -187,10 +187,10 @@ def string_to_min(date):
 
 
 def get_list_groupes(df):
-    """Renvoie une liste qui à chaque index de groupe
+    """Renvoie un dictionnaire qui à chaque index de groupe
     renvoie un objet Groupe donnant sa composition.
     """
-    listeGroupes = []
+    listeGroupes = dict()
 
     for idx, row in df.iterrows():
 
@@ -201,7 +201,7 @@ def get_list_groupes(df):
             nb_enfants=row['Enfants'],
             nb_WCHR=row['WCHR'],
             classe=row['Classe'],
-            transit_time=string_to_min(str(row['TransitTime']))
+            #transit_time=string_to_min(str(row['TransitTime']))
         )
     
     return listeGroupes

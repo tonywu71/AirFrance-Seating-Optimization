@@ -9,7 +9,7 @@ import pandas as pd
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -17,6 +17,8 @@ from utils_static import *
 from utils_dynamic import *
 
 
+#external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+#app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app = dash.Dash(__name__)
 
@@ -40,13 +42,11 @@ avion = Avion(ref_avion=AVION, placements=placements)
 fig = get_plane_config_graph(date, AVION)
 listeGroupes, listePassagers = get_config_instance(date)
 
-
-# On commence à parcourir le générateur des groupes :
-groupe_courant = next(groupe_generator(listeGroupes))
-
-
 # idx_groupe_courant contiendra le numéro du groupe actuel
 idx_groupe_courant = 0
+
+# Liste qui contient l'ordre de visite des groupes
+groupe_courant = listeGroupes[idx_groupe_courant]
 
 # idem mais avec l'index du passager
 idx_passager_courant = 0
@@ -129,29 +129,53 @@ debug_textbox = html.Div([
 confirm_button = html.Button('Valider', id='confirm-button', type='submit', disabled=True)
 
 
+sliders_container = html.Div([
+    dcc.Markdown("""
+                **Groupe**
+            """),
 
+    dcc.Slider(
+        id="slider-groupe",
+        min=0,
+        max=len(listeGroupes),
+        marks={idx: f'{idx}'for idx in range(len(listeGroupes))},
+        value=idx_groupe_courant, # vaut 0 a priori au lancement
+        disabled=True
+    ),
 
-slider_progress = dcc.Slider(
-    id="slider-progress",
-    min=0,
-    max=len(listeGroupes),
-    marks={i: 'Groupe {}'.format(i) for i in range(10)},
-    value=idx_groupe_courrant, # vaut 0 a priori au lancement
-    disabled=True
-)  
+    dcc.Markdown("""
+                **Passager**
+            """),
+
+    dcc.Slider(
+        id="slider-passager",
+        min=0,
+        max=len(listeGroupes[idx_groupe_courant].list_passagers),
+        marks={idx: f'Passager {passager.idx}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
+        value=idx_passager_courant, # vaut 0 a priori au lancement
+        disabled=True
+    )
+])
+
+scatter_plot = dcc.Graph(
+        id="scatter-plot",
+        figure=fig,
+        config={"displayModeBar": False, "showTips": False}
+        )
 
 
 ## ------ Defining Layout ------
 app.layout = html.Div([
     div_header, # Banderolle de présentation du projet
 
-    dcc.Graph(
-        id="scatter-plot",
-        figure=fig,
-        config={"displayModeBar": False, "showTips": False}
-        ),
+    dcc.Markdown(f"""
+                **{date}_{AVION}**
+            """),
+
+    scatter_plot,
     debug_textbox,
-    confirm_button
+    confirm_button,
+    sliders_container
 ])
 
 
@@ -168,32 +192,54 @@ def display_click_data(clickData):
 
 @app.callback(
     Output('confirm-button', 'disabled'),
-    Input('scatter-plot', 'clickData'))
+    Input('scatter-plot', 'clickData')
+    )
 def is_point_selected(clickData):
     return clickData is None
 
 
 @app.callback(
     [
-        Output('slider-progress', 'value'),
+        Output('slider-passager', 'value'),
+        Output('slider-passager', 'max'),
+        Output('slider-passager', 'marks'),
+        Output('slider-groupe', 'value'),
         Output('scatter-plot', 'figure')
     ],
-    [
-        Input('confirm-button', 'n_clicks'),
-        Input(# ajouter le json en sortie du point sélectionné)
-    ])
-def confirm_action(n_clicks):
-    idx_passager_courant += 1 # idx_groupe_courant est une variable globale
+    Input('confirm-button', 'n_clicks'),
+    State('scatter-plot', 'clickData'))
+def confirm_action(n_clicks, clickData):
+    global idx_groupe_courant, historique_groupes, idx_passager_courant, date, AVION
 
-    if idx_passager_courant not in listeGroupes[idx_groupe_courant]: # Si on a fini de regarder un groupe...
-        idx_groupe_courant += 1
-        idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
-    
-    places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant) # comment récupérer id_passager ?
-    avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
+    if n_clicks is not None:
+        
+        idx_passager_courant += 1 # idx_groupe_courant est une variable globale
+        
 
-    return
-    #return idx_groupe_courant, fig
+        place_choisie = (clickData["points"][0]["x"], clickData["points"][0]["y"])
+
+        if idx_passager_courant not in [elt.idx for elt in listeGroupes[idx_groupe_courant].list_passagers]: # Si on a fini de regarder un groupe...
+            idx_groupe_courant += 1
+            idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
+        
+        print(f"idx_groupe_courant = {idx_groupe_courant}")
+        print(f"idx_passager_courant = {idx_passager_courant}")
+        print()
+
+        # places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant) # comment récupérer id_passager ?
+        # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
+
+
+    # Mise à jour des sliders :
+    listePassagers_courant = listeGroupes[idx_groupe_courant].list_passagers
+    max_slider_passager = len(listePassagers_courant)
+    marks_slider_passager = {idx: f'Passager {passager.idx}' for idx, passager in enumerate(listePassagers_courant)},
+
+
+    fig = get_plane_config_graph(date, AVION)
+    # NB: On profite de regénérer la figure pour désélectionner le point précédent !
+
+    return idx_passager_courant, max_slider_passager, marks_slider_passager, idx_groupe_courant, fig
 
     
 app.run_server(debug=True)

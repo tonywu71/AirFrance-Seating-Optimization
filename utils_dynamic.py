@@ -161,44 +161,27 @@ class Avion:
 
 
 ## ----- Autres utilitaires -----
-def groupe_generator(liste_groupes):
-    """Générateur pour parcourir simplement tous les groupes d'une instance
-    de manière aléatoire
 
-    Args:
-        liste_groupes (list of Groupe)  
+## Finalement, on préférera shuffle directement dans l'instance pour faire des tests plus facilement.
+# def get_positions_possibles(avion, groupe, id_passager):
+#     """Pour une instance de l'avion (a priori déjà partiellement rempli),
+#     un groupe donné et un individu de ce groupe (identifié par son id_passager),
+#     renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
+#     à ce même passager.
 
-    Yields:
-        Groupe
-    """
-    while len(liste_groupes) != 0:
-        n = len(liste_groupes)
-        groupe_courant = liste_groupes.pop(np.random.randint(0, n))
-        # NB : np.random.randint renvoie un nombre entre 0 et n exlus
+#     Args:
+#         avion (Avion): instance de l'objet Avion à un certain temps t
+#         groupe (Groupe): groupe où chercher le passager
+#         id_passager (int): identifiant du passager (dans le groupe)
+#     """
 
-        yield groupe_courant
+#     # Liste de tuples (x, y) donnant les coordonées des places proposées:
+#     places_proposees = []
 
-
-
-def get_positions_possibles(avion, groupe, id_passager):
-    """Pour une instance de l'avion (a priori déjà partiellement rempli),
-    un groupe donné et un individu de ce groupe (identifié par son id_passager),
-    renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
-    à ce même passager.
-
-    Args:
-        avion (Avion): instance de l'objet Avion à un certain temps t
-        groupe (Groupe): groupe où chercher le passager
-        id_passager (int): identifiant du passager (dans le groupe)
-    """
-
-    # Liste de tuples (x, y) donnant les coordonées des places proposées:
-    places_proposees = []
-
-    # TODO -> compléter la liste
+#     # TODO -> compléter la liste
 
 
-    return places_proposees
+#     return places_proposees
 
 def update_avion(avion, groupe, id_passager, place_choisie):
     """À partir d'une première instance d'objet Avion, d'un groupe donné,
