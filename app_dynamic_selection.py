@@ -218,6 +218,7 @@ def display_click_data(clickData):
 def is_point_selected(clickData):
     return clickData is None
 
+first_it = True #flag first it 
 
 @app.callback(
     [
@@ -232,7 +233,7 @@ def is_point_selected(clickData):
     State('scatter-plot', 'clickData'))
 
 def confirm_action(n_clicks, clickData):
-    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION
+    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, first_it
 
     if n_clicks is not None:
         idx_passager_courant += 1 # idx_groupe_courant est une variable globale
@@ -241,10 +242,16 @@ def confirm_action(n_clicks, clickData):
         place_choisie = (clickData["points"][0]["x"], clickData["points"][0]["y"])
         print('debugei')
         print(list(range(len(listeGroupes[idx_groupe_courant].list_passagers))))
+        print(idx_groupe_courant)
         if idx_passager_courant not in list(range(len(listeGroupes[idx_groupe_courant].list_passagers))): # Si on a fini de regarder un groupe...
             idx_groupe_courant += 1
             idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
         
+        if first_it:
+            idx_groupe_courant -= 1 #mettre premier groupe à 0
+            first_it = False 
+
+
         print(f"idx_groupe_courant = {idx_groupe_courant}")
         print(f"idx_passager_courant = {idx_passager_courant}")
         print()
