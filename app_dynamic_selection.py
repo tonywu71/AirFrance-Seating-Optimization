@@ -211,7 +211,6 @@ app.layout = html.Div([
 def display_click_data(clickData):
     return json.dumps(clickData, indent=2)
 
-
 @app.callback(
     Output('confirm-button', 'disabled'),
     Input('scatter-plot', 'clickData')
@@ -228,7 +227,8 @@ first_it = True #flag first it
         # Output('slider-passager', 'marks'),
         Output('slider-groupe', 'value'),
         Output('scatter-plot', 'figure'),
-        Output('debug-placements', 'children')
+        Output('debug-placements', 'children'),
+        Output('scatter-plot', 'clickData')
     ],
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
@@ -283,7 +283,7 @@ def confirm_action(n_clicks, clickData):
 
  
 
-    return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json
+    return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None
 
     
 app.run_server(debug=True)
