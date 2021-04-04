@@ -76,7 +76,11 @@ def get_place_proposees_figure(places_proposees, AVION):
         y= [element[1] for element in places_proposees]
     )
 
-    
+    fig.update_xaxes(range=[0, 37])
+    fig.update_yaxes(range=[0, 8])
+
+    fig.update_traces(mode='markers', marker_line_width=2, marker_size=18, marker_color = 'lightgreen')
+
 
     # Add images
     fig.add_layout_image(avion['background']) 

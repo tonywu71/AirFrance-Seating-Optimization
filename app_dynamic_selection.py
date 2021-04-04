@@ -230,6 +230,7 @@ def is_point_selected(clickData):
     ],
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
+
 def confirm_action(n_clicks, clickData):
     global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION
 
@@ -253,7 +254,8 @@ def confirm_action(n_clicks, clickData):
 
 
     else:
-        places_proposees
+        places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
+        print(places_proposees)
         pass
     
     # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
