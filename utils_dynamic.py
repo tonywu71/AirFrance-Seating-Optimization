@@ -1,4 +1,5 @@
 import numpy as np
+import random as rd
 import re
 import json
 
@@ -143,9 +144,9 @@ def get_dummy_places_proposees():
     list_x_possibles = [elt for  elt in range(1, 37) if elt not in [9, 22]]
     list_y_possibles = [elt for elt in range(1, 8) if elt != 4]
 
-    nb_places_proposees = np.randint(1, 10)
+    nb_places_proposees = rd.randint(1, 11)
     for _ in range(nb_places_proposees):
-        places_proposees.append(np.random.choice(list_x_possibles, size=1), np.random.choice(list_y_possibles, size=1))
+        places_proposees.append((np.random.choice(list_x_possibles), np.random.choice(list_y_possibles)))
 
     return places_proposees
 

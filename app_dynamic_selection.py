@@ -39,7 +39,7 @@ avion = Avion(ref_avion=AVION, placements=placements)
 
 
 # Récupération des données liées à la configuration de l'avion
-fig = get_plane_config_graph(date, AVION)
+fig = get_place_proposees_figure(date, AVION)
 listeGroupes, listePassagers = get_config_instance(date)
 
 # idx_groupe_courant contiendra le numéro du groupe actuel
@@ -212,6 +212,7 @@ def confirm_action(n_clicks, clickData):
     global idx_groupe_courant, historique_groupes, idx_passager_courant, date, AVION
 
     if n_clicks is not None:
+        print("test")
         
         idx_passager_courant += 1 # idx_groupe_courant est une variable globale
         
@@ -226,17 +227,21 @@ def confirm_action(n_clicks, clickData):
         print(f"idx_passager_courant = {idx_passager_courant}")
         print()
 
-        places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant) # comment récupérer id_passager ?
+        
+        places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
+        print(places_proposees)
+
         # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
 
+        fig = get_place_proposees_figure(places_proposees, AVION)
 
     # Mise à jour des sliders :
     listePassagers_courant = listeGroupes[idx_groupe_courant].list_passagers
     max_slider_passager = len(listePassagers_courant)
     marks_slider_passager = {idx: f'Passager {str(passager.idx)}' for idx, passager in enumerate(listePassagers_courant)},
 
-
-    fig = get_place_proposees_figure(date, AVION)
+    fig = None
+    
     # NB: On profite de regénérer la figure pour désélectionner le point précédent !
 
     return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig
