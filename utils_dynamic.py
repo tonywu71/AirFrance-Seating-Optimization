@@ -77,7 +77,7 @@ def get_place_proposees_figure(places_proposees, AVION):
     )
 
     fig.update_xaxes(range=[0, 37])
-    fig.update_yaxes(range=[0, 8])
+    fig.update_yaxes(range=[0.5, 7.5])
 
     fig.update_traces(mode='markers', marker_line_width=2, marker_size=18, marker_color = 'lightgreen')
 

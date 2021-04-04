@@ -135,6 +135,8 @@ confirm_button = html.Button('Valider', id='confirm-button', type='submit', disa
 
 
 sliders_container = html.Div([
+
+    
     dcc.Markdown("""
                 **Groupe**
             """),
@@ -145,7 +147,7 @@ sliders_container = html.Div([
         max=len(listeGroupes),
         marks={idx: f'{idx}'for idx in range(len(listeGroupes))  if idx % 10 == 0},
         value=idx_groupe_courant, # vaut 0 a priori au lancement
-        disabled=True
+        disabled=True,
     ),
 
     dcc.Markdown("""
@@ -160,7 +162,7 @@ sliders_container = html.Div([
         value=idx_passager_courant, # vaut 0 a priori au lancement
         disabled=True
     )
-])
+],  style = { 'width': '70%', 'margin-left': 'auto', 'margin-right': 'auto'})
 
 # Figure Plotly où on sélectionnera les places pour chaque passager :
 scatter_plot = dcc.Graph(
@@ -191,11 +193,10 @@ app.layout = html.Div([
     dcc.Markdown(f"""
                 **{date}_{AVION}**
             """),
-
+    sliders_container,
     scatter_plot,
     debug_clickData,
     confirm_button,
-    sliders_container,
     debug_placements
 ])
 
