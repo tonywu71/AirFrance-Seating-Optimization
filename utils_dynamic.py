@@ -46,18 +46,7 @@ def get_config_instance(date):
     return listeGroupes, listePassagers
 
 
-def get_plane_config_graph(date, AVION):
-    ## --- Lecture du CSV ---
-    filename = f'solution_{date}_{AVION}.csv'
-    df_ans = pd.read_csv(os.path.join('output', filename))
-    
-
-    ## --- Calcul du barycentre depuis df_ans directement
-    barycentre_x, barycentre_y = calcul_barycentre(df_ans)
-
-    ## --- Récupération des marqueurs pour le tracé dans Plotly
-    marker_list = get_markers_passagers(df_ans)
-
+def get_place_proposees_figure(places_proposees, AVION):
     ## --- Récupération de certaines métadonnées nécessaire à Plotly
     with open('./'+AVION+'.json') as f:
         preprocess = json.load(f)
@@ -79,47 +68,15 @@ def get_plane_config_graph(date, AVION):
     }
 
 
+
     ## --- Plot de la figure avec Plotly ---
     fig = px.scatter(
-        df_ans,
-        x='x',
-        y='y',
-        hover_name='Siège',
-        color= 'ID Groupe',
-        size='Poids',
-        hover_data=df_ans.columns,
-        template="plotly_white",
-        color_continuous_scale=px.colors.diverging.RdBu)
+        x= [element[0] for element in places_proposees],
+        y= [element[1] for element in places_proposees],
+        color = 'green'
+    )
 
     
-
-    fig.update_traces(marker=dict(line=dict(width=2, color='black')),
-                    marker_symbol=marker_list,
-                    selector=dict(mode='markers'))
-
-    ## Ajout du barycentre
-    fig.add_trace(
-        go.Scatter(x=[barycentre_x],
-                y=[barycentre_y],
-                name="Barycentre",
-                showlegend=False,
-                marker_symbol=["star-triangle-up-dot"],
-                mode="markers",
-                marker=dict(size=20,
-                            color="green",
-                            line=dict(width=2, color='DarkSlateGrey'))))
-
-    fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
-
-
-    # Positionnement de la légende
-    fig.update_layout(legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1
-    ))
 
     # Add images
     fig.add_layout_image(avion['background']) 
