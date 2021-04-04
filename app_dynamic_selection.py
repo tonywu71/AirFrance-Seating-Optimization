@@ -239,8 +239,9 @@ def confirm_action(n_clicks, clickData):
         
 
         place_choisie = (clickData["points"][0]["x"], clickData["points"][0]["y"])
-
-        if idx_passager_courant not in [elt.idx for elt in listeGroupes[idx_groupe_courant].list_passagers]: # Si on a fini de regarder un groupe...
+        print('debugei')
+        print(list(range(len(listeGroupes[idx_groupe_courant].list_passagers))))
+        if idx_passager_courant not in list(range(len(listeGroupes[idx_groupe_courant].list_passagers))): # Si on a fini de regarder un groupe...
             idx_groupe_courant += 1
             idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
         
@@ -252,10 +253,15 @@ def confirm_action(n_clicks, clickData):
         places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
         print(places_proposees)
 
+        # Mise à jour du dictionnaire placements :
+        placements[idx_groupe_courant, idx_passager_courant] = place_choisie
+        placements_json = placements_to_json(placements)
+
 
     else:
         places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
         print(places_proposees)
+        placements_json = str()
         pass
     
     # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
@@ -267,9 +273,7 @@ def confirm_action(n_clicks, clickData):
     marks_slider_passager = {idx: f'Passager {str(passager.idx)}' for idx, passager in enumerate(listePassagers_courant)},
     # NB: On profite de regénérer la figure pour désélectionner le point précédent !
 
-    # Mise à jour du dictionnaire placements :
-    placements[idx_groupe_courant, idx_passager_courant] = places_proposees
-    placements_json = placements_to_json(placements)
+ 
 
     return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json
 

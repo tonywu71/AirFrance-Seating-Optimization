@@ -185,5 +185,6 @@ def placements_to_json(placements):
     """Utilitaire pour avoir un dictionnaire avec des strings et non des tuples.
     Permet de debug.
     """
+    print(placements)
     placements_new = {f"({str(key[0])}, {str(key[1])})": f"({str(val[0])}, {str(val[1])})" for key, val in placements.items()}
     return json.dumps(placements_new, indent=2)
