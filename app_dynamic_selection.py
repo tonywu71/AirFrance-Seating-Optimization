@@ -151,7 +151,7 @@ sliders_container = html.Div([
         id="slider-passager",
         min=0,
         max=len(listeGroupes[idx_groupe_courant].list_passagers),
-        marks={idx: f'Passager {passager.idx}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
+        marks={idx: f'Passager {str(passager.idx)}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
         value=idx_passager_courant, # vaut 0 a priori au lancement
         disabled=True
     )
@@ -233,7 +233,7 @@ def confirm_action(n_clicks, clickData):
     # Mise à jour des sliders :
     listePassagers_courant = listeGroupes[idx_groupe_courant].list_passagers
     max_slider_passager = len(listePassagers_courant)
-    marks_slider_passager = {idx: f'Passager {passager.idx}' for idx, passager in enumerate(listePassagers_courant)},
+    marks_slider_passager = {idx: f'Passager {str(passager.idx)}' for idx, passager in enumerate(listePassagers_courant)},
 
 
     fig = get_plane_config_graph(date, AVION)
