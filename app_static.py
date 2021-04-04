@@ -1,3 +1,5 @@
+## ------ Dash application for visualizing solutions to the static problem ------
+
 import os
 import json
 import re
@@ -11,7 +13,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
 
-from utils import *
+from utils_static import *
 
 
 app = dash.Dash(__name__)
@@ -33,7 +35,7 @@ for filename in os.listdir('output'):
         dates_avion[date] = avion
 
 # Test pour vérifier si on arrive ou non à récupérer des données
-assert len(dates_avion) != 0, "Pas de données correctes trouvées dans le dossier data !"
+assert len(dates_avion) != 0, 'Pas de données correctes trouvées dans le dossier "output" !'
 
 # On extrait les clés du dictionnaire dates_avion pour lire plus facilement les dates:
 list_dates = list(dates_avion.keys())
@@ -242,72 +244,6 @@ def update_bar_chart(value):
         xanchor="right",
         x=1
     ))
-
-    
-
-    # ## Ajout des barres colorées pour visualiser les emplacements spécifiques de l'avion
-    # #Issues de Secours
-    # fig.add_shape(x0=10.5,
-    #             x1=12.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="red",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=10.5,
-    #             x1=12.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="red",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-
-    # #Classe Business
-    # fig.add_shape(x0=0.5,
-    #             x1=9.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="orange",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=0.5,
-    #             x1=9.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="orange",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-
-    # #Classe Economie
-    # fig.add_shape(x0=9.5,
-    #             x1=10.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=9.5,
-    #             x1=10.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=12.5,
-    #             x1=28.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=12.5,
-    #             x1=28.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-
 
     # Add images
     fig.add_layout_image(avion['background']) 
