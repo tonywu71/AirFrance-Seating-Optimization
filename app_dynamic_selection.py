@@ -151,7 +151,7 @@ sliders_container = html.Div([
         id="slider-passager",
         min=0,
         max=len(listeGroupes[idx_groupe_courant].list_passagers),
-        marks={idx: f'Passager {passager.idx}' for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
+        # marks={idx: f'Passager {passager.idx}' for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
         value=idx_passager_courant, # vaut 0 a priori au lancement
         disabled=True
     )
@@ -202,7 +202,7 @@ def is_point_selected(clickData):
     [
         Output('slider-passager', 'value'),
         Output('slider-passager', 'max'),
-        Output('slider-passager', 'marks'),
+        # Output('slider-passager', 'marks'),
         Output('slider-groupe', 'value'),
         Output('scatter-plot', 'figure')
     ],
@@ -226,20 +226,20 @@ def confirm_action(n_clicks, clickData):
         print(f"idx_passager_courant = {idx_passager_courant}")
         print()
 
-        # places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant) # comment récupérer id_passager ?
+        places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant) # comment récupérer id_passager ?
         # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
 
 
     # Mise à jour des sliders :
     listePassagers_courant = listeGroupes[idx_groupe_courant].list_passagers
     max_slider_passager = len(listePassagers_courant)
-    marks_slider_passager = {idx: f'Passager {passager.idx}' for idx, passager in enumerate(listePassagers_courant)},
+    # marks_slider_passager = {idx: f'Passager {passager.idx}' for idx, passager in enumerate(listePassagers_courant)},
 
 
     fig = get_plane_config_graph(date, AVION)
     # NB: On profite de regénérer la figure pour désélectionner le point précédent !
 
-    return idx_passager_courant, max_slider_passager, marks_slider_passager, idx_groupe_courant, fig
+    return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig
 
     
 app.run_server(debug=True)

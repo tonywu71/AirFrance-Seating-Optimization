@@ -162,26 +162,36 @@ class Avion:
 
 ## ----- Autres utilitaires -----
 
-## Finalement, on préférera shuffle directement dans l'instance pour faire des tests plus facilement.
-# def get_positions_possibles(avion, groupe, id_passager):
-#     """Pour une instance de l'avion (a priori déjà partiellement rempli),
-#     un groupe donné et un individu de ce groupe (identifié par son id_passager),
-#     renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
-#     à ce même passager.
+# Finalement, on préférera shuffle directement dans l'instance pour faire des tests plus facilement.
+def get_positions_possibles(avion, groupe, id_passager):
+    """Pour une instance de l'avion (a priori déjà partiellement rempli),
+    un groupe donné et un individu de ce groupe (identifié par son id_passager),
+    renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
+    à ce même passager.
+    Args:
+        avion (Avion): instance de l'objet Avion à un certain temps t
+        groupe (Groupe): groupe où chercher le passager
+        id_passager (int): identifiant du passager (dans le groupe)
+    """
+    # Liste de tuples (x, y) donnant les coordonées des places proposées:
+    places_proposees = []
+    # TODO -> compléter la liste
+    places_proposees = get_dummy_places_proposees()
 
-#     Args:
-#         avion (Avion): instance de l'objet Avion à un certain temps t
-#         groupe (Groupe): groupe où chercher le passager
-#         id_passager (int): identifiant du passager (dans le groupe)
-#     """
+    return places_proposees
 
-#     # Liste de tuples (x, y) donnant les coordonées des places proposées:
-#     places_proposees = []
+def get_dummy_places_proposees():
+    places_proposees = []
 
-#     # TODO -> compléter la liste
+    list_x_possibles = [elt for  elt in range(1, 37) if elt not in [9, 22]]
+    list_y_possibles = [elt for elt in range(1, 8) if elt != 4]
 
+    nb_places_proposees = np.randint(1, 10)
+    for _ in range(nb_places_proposees):
+        places_proposees.append(np.random.choice(list_x_possibles, size=1), np.random.choice(list_y_possibles, size=1))
 
-#     return places_proposees
+    return places_proposees
+
 
 def update_avion(avion, groupe, id_passager, place_choisie):
     """À partir d'une première instance d'objet Avion, d'un groupe donné,
