@@ -46,7 +46,7 @@ idx_groupe_courant = 0
 groupe_courant = listeGroupes[idx_groupe_courant]
 
 # idem mais avec l'index du passager
-idx_passager_courant = 0c
+idx_passager_courant = 0
 
 # Récupération des données liées à la configuration de l'avion
 places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
@@ -213,6 +213,7 @@ def is_point_selected(clickData):
     ],
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
+
 def confirm_action(n_clicks, clickData):
     global idx_groupe_courant, historique_groupes, idx_passager_courant, date, AVION
 
@@ -238,7 +239,8 @@ def confirm_action(n_clicks, clickData):
 
 
     else:
-        print("else")
+        places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
+        print(places_proposees)
         pass
     
     # avion = update_avion(avion, groupe_courant, idx_passager_courant, place_choisie) # avion est une variable globale
