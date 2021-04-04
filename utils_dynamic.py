@@ -120,15 +120,15 @@ class Avion:
 ## ----- Autres utilitaires -----
 
 # Finalement, on préférera shuffle directement dans l'instance pour faire des tests plus facilement.
-def get_positions_possibles(avion, groupe, id_passager):
+def get_positions_possibles(avion, groupe, idx_passager):
     """Pour une instance de l'avion (a priori déjà partiellement rempli),
-    un groupe donné et un individu de ce groupe (identifié par son id_passager),
+    un groupe donné et un individu de ce groupe (identifié par son idx_passager),
     renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
     à ce même passager.
     Args:
         avion (Avion): instance de l'objet Avion à un certain temps t
         groupe (Groupe): groupe où chercher le passager
-        id_passager (int): identifiant du passager (dans le groupe)
+        idx_passager (int): identifiant du passager (dans le groupe)
     """
     # Liste de tuples (x, y) donnant les coordonées des places proposées:
     places_proposees = []
