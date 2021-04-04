@@ -37,11 +37,6 @@ placements = dict()
 # (à ne pas confondre avec AVION qui lui correpond à la référence de l'avion)
 avion = Avion(ref_avion=AVION, placements=placements)
 
-
-# Récupération des données liées à la configuration de l'avion
-places_proposees = get_positions_possibles()
-fig = get_place_proposees_figure(places_proposees, AVION)
-
 listeGroupes, listePassagers = get_config_instance(date)
 
 # idx_groupe_courant contiendra le numéro du groupe actuel
@@ -51,7 +46,15 @@ idx_groupe_courant = 0
 groupe_courant = listeGroupes[idx_groupe_courant]
 
 # idem mais avec l'index du passager
-idx_passager_courant = 0
+idx_passager_courant = 0c
+
+# Récupération des données liées à la configuration de l'avion
+places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
+fig = get_place_proposees_figure(places_proposees, AVION)
+
+
+
+
 
 
 ## ------ Building blocks for Layout ------
