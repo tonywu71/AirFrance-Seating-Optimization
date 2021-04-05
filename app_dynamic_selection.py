@@ -173,7 +173,7 @@ confirm_button = html.Button('Valider', id='confirm-button', type='submit', disa
         'width': '15%',
         'margin':'auto'}
     )
-button_finished = html.Button('Regarder visualization finale!', type='submit', id='button-finished', disabled = False)
+button_finished = html.Button('Regarder la visualisation finale', type='submit', id='button-finished', disabled = False)
 
 
 sliders_container = html.Div([
@@ -225,7 +225,7 @@ scatter_plot = html.Div([
 # debug_placements = html.Pre(id='debug-placements')
 
 finished_phrase = html.H3(
-    "Vous avez fini de placer les passegers!", style = {'color': '#990000', 'text-align':'center'}, id = 'finished-phrase'
+    "Vous avez fini de placer les passagers!", style = {'color': '#990000', 'text-align':'center'}, id = 'finished-phrase'
 )
 
 
@@ -256,13 +256,8 @@ tab_1_content = html.Div([
     scatter_plot,
     # debug_clickData,
     confirm_button,
-<<<<<<< HEAD
     # debug_placements,
     finished_phrase,
-=======
-    debug_placements,
-    
->>>>>>> 4322e32c1e04e267da5ba70fa438ce3550a52e8c
 
 ])
 
@@ -288,8 +283,8 @@ app.layout = html.Div([
 
     html.Div(id='tabs-content-classes', style={"justify-content": 'space-around'},),
 
-    html.Div([finished_phrase], style={ 'margin-left': '450px','verticalAlign': 'middle'}),
-    html.Div([button_finished,], style={'margin-left': '550px', 'margin-bottom': '10px','verticalAlign': 'middle'}),
+    html.Div([finished_phrase], style={ 'margin-left': '450px','verticalAlign': 'middle', 'display': 'none'}),
+    html.Div([button_finished,], style={'margin-left': '550px', 'margin-bottom': '10px','verticalAlign': 'middle', 'display': 'none'}),
 
     html.Div([
     dcc.Markdown(f"""
@@ -353,7 +348,7 @@ def is_point_selected(clickData):
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
 def confirm_action(n_clicks, clickData):
-    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, first_it, finish, groupe_places, PI_dynamique, ALL_SEATS
+    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, finish, groupe_places, PI_dynamique, ALL_SEATS
     
     
     if  idx_groupe_courant < len(listeGroupes) - 1:
@@ -419,15 +414,10 @@ def confirm_action(n_clicks, clickData):
 
 
 
-        # return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'none'}
-        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'none'}
-    else:
-        # return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}
-        return 0, 0, 0, px.scatter(), None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block'}
-    #     return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
+        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
 
-    # else:
-    #     return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'},{'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
+    else:
+        return 0, 0, 0, px.scatter(), None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'},{'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
 
 
 
