@@ -17,6 +17,7 @@ from utils_static import *
 from utils_dynamic import *
 
 
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = 'Projet Groupe 2 - AirFrance'
@@ -27,17 +28,13 @@ app.config['suppress_callback_exceptions']=True
 
 # TESTING PURPOSES
 list_dates = get_list_dates_input()
-date = "6Nov"
+date = "17Nov"
 AVION = "A321"
 
 
 # Dicionnaire (global) qui à chaque id_passager associe la place choisie
 placements = dict()
 
-
-# Initialisation de l'instance Avion
-# (à ne pas confondre avec AVION qui lui correpond à la référence de l'avion)
-avion = Avion(ref_avion=AVION, placements=placements)
 
 listeGroupes, listePassagers = get_config_instance(date)
 
@@ -50,9 +47,47 @@ groupe_courant = listeGroupes[idx_groupe_courant]
 # idem mais avec l'index du passager
 idx_passager_courant = 0
 
+
+# groupe_places est une liste qui contient tous les index des groupes complètement placés
+groupe_places = []
+
+
+# Récupération de la variable avion
+with open('./'+AVION+'.json') as f:
+    preprocess = json.load(f)
+    
+avion = {
+    'x_max': preprocess['x_max'],
+    'y_max': preprocess['y_max'],
+    'exit': preprocess['exit'],
+    'hallway': preprocess['hallway'],
+    'barycentre': preprocess['barycentre'],
+    'background': preprocess['background'],
+    'seats': {
+        'real': [],
+        'fictive': [],
+        'business': [],
+        'exit': [],
+        'eco': []        
+    }
+}
+
+for seat_category in preprocess['seats'].keys():
+    for couple in preprocess['seats'][seat_category]:
+        x,y = couple[0], couple[1]
+        avion['seats'][seat_category].append((x,y))      
+
+
+# Initialisation de PI à partir de la solution initiale
+df_statique = pd.read_csv(os.path.join("output", f"solution_{date}_{AVION}.csv"))
+PI_statique = df_to_PI(df_statique, avion)
+PI_dynamique = df_to_PI(df_statique, avion)
+
 # Récupération des données issues de la première itération
-places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
+ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+places_proposees = list(ALL_SEATS.keys())
 fig = get_place_proposees_figure(places_proposees, AVION)
+
 
 
 
@@ -300,41 +335,58 @@ first_it = True #flag first it
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
 def confirm_action(n_clicks, clickData):
-    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, first_it, finish
+    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, first_it, finish, groupe_places, PI_dynamique, ALL_SEATS
+    
     
     if  idx_groupe_courant < len(listeGroupes) - 1:
         if n_clicks is not None:
-            idx_passager_courant += 1 # idx_groupe_courant est une variable globale
+            
             
 
             place_choisie = (clickData["points"][0]["x"], clickData["points"][0]["y"])
             
-            if idx_passager_courant not in list(range(len(listeGroupes[idx_groupe_courant].list_passagers))): # Si on a fini de regarder un groupe...
-                idx_groupe_courant += 1
-                idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
             
-            if first_it:
-                idx_groupe_courant -= 1 #mettre premier groupe à 0
-                first_it = False 
+            
+            # Mise à jour du dictionnaire placements :
+            placements[idx_groupe_courant, idx_passager_courant] = place_choisie
+            placements_json = placements_to_json(placements)
+            groupe_places.append(idx_groupe_courant)
+
+            # if first_it:
+            #     idx_groupe_courant -= 1 #mettre premier groupe à 0
+            #     first_it = False 
 
 
             print(f"idx_groupe_courant = {idx_groupe_courant}")
             print(f"idx_passager_courant = {idx_passager_courant}")
             print()
 
+            print(f"groupe_places = {groupe_places}")
+
+            # Mise à jour du PI_dynamique
+            x, y = place_choisie
+            PI_dynamique = ALL_SEATS[x, y]
+
+            idx_passager_courant += 1 # idx_groupe_courant est une variable globale
+
+            if idx_passager_courant not in list(range(len(listeGroupes[idx_groupe_courant].list_passagers))): # Si on a fini de regarder un groupe...
+                idx_groupe_courant += 1
+                idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
 
             
-            places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
-            print(places_proposees)
+            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+            places_proposees = list(ALL_SEATS.keys())
+            # print(f"places_proposees = {places_proposees}")
 
-            # Mise à jour du dictionnaire placements :
-            placements[idx_groupe_courant, idx_passager_courant] = place_choisie
-            placements_json = placements_to_json(placements)
+            
+
+            
 
 
         else:
-            places_proposees = get_positions_possibles(avion, groupe_courant, idx_passager_courant)
-            print(places_proposees)
+            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+            places_proposees = list(ALL_SEATS.keys())
+            # print(f"places_proposees = {places_proposees}")
             placements_json = str()
             pass
         
@@ -464,9 +516,8 @@ def display_finish_graph(n_clicks):
     Output("result-preview", "figure"), 
     Input('tabs', 'value'))
 def update_preview(n_clicks):
-
     ## --- Récupération des données de l'instance sélectionnée dans le Dropdown ---
-    global placements, date, AVION
+    global placements, date, AVION, avion
 
     df_ans = placements_to_df(placements, date, AVION)
 
@@ -500,6 +551,11 @@ def update_preview(n_clicks):
         }
     }
 
+    for seat_category in preprocess['seats'].keys():
+        for couple in preprocess['seats'][seat_category]:
+            x,y = couple[0], couple[1]
+            avion['seats'][seat_category].append((x,y))      
+
     ## --- Plot de la figure avec Plotly ---
     if len(df_ans) == 0:
         fig = px.scatter()
@@ -525,6 +581,13 @@ def update_preview(n_clicks):
 
 
     ## Ajout du barycentre
+
+    # Couleur pour le point représentant le barycentre selon sa position
+    if avion['barycentre'][1] >= barycentre_x >= avion['barycentre'][0] and avion['barycentre'][3] >= barycentre_x >= avion['barycentre'][2]:
+        color = "green"
+    else:
+        color = "red"
+
     fig.add_trace(
         go.Scatter(x=[barycentre_x],
                 y=[barycentre_y],
@@ -533,7 +596,7 @@ def update_preview(n_clicks):
                 marker_symbol=["star-triangle-up-dot"],
                 mode="markers",
                 marker=dict(size=20,
-                            color="green",
+                            color=color,
                             line=dict(width=2, color='DarkSlateGrey'))))
 
     fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
