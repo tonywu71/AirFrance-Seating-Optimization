@@ -20,6 +20,7 @@ from utils_dynamic import *
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# app = dash.Dash(__name__)
 app.title = 'Projet Groupe 2 - AirFrance'
 
 # Car l'usage des tabs crée des components à chaque changement d'onglet :
@@ -38,6 +39,9 @@ placements = dict()
 
 listeGroupes, listePassagers = get_config_instance(date)
 
+# print(f"listeGroupes = {listeGroupes}")
+# print(f"listePassagers = {listePassagers}")
+
 # idx_groupe_courant contiendra le numéro du groupe actuel
 idx_groupe_courant = 0
 
@@ -53,7 +57,11 @@ groupe_places = []
 
 
 # Récupération de la variable avion
-with open('./'+AVION+'.json') as f:
+extension = ""
+if len([passager.id_passager for passager in listePassagers if passager.classe == "J"]) == 0:
+    extension = "_nb"
+
+with open('./'+AVION+extension+'.json') as f:
     preprocess = json.load(f)
     
 avion = {
@@ -120,10 +128,10 @@ div_header = html.Div([
             html.Img(
                 src=app.get_asset_url("AirFrance_logo.png"),
                 style={
-                    'width': '20%',
+                    'width': '300px',
                     'position': 'absolute',
-                    'right': '4%',
-                    'top': '19%',
+                    'right': '10px',
+                    'top': '75px',
                 },
                 className="app__menu__img",
             )
@@ -136,10 +144,10 @@ div_header = html.Div([
             html.Img(
                 src=app.get_asset_url("cs_logo.png"),
                 style={
-                    'width': '13%',
+                    'width': '250px',
                     'position': 'absolute',
-                    'right': '85%',
-                    'top': '15%',
+                    'left': '10px',
+                    'top': '30px',
                 },
                 className="app__menu__img",
             )
@@ -158,14 +166,23 @@ div_header = html.Div([
 
 
 # Bouton de confirmation du choix de la place :
-confirm_button = html.Button('Valider', id='confirm-button', type='submit', disabled=True)
+confirm_button = html.Div([
+    html.Button('Valider',
+    id='confirm-button',
+    type='submit',
+    disabled=True
+    )],
+    style={'margin-bottom': '10px',
+              'textAlign':'center',
+              'width': '15%',
+              'margin':'auto'}
+)
 
 
 sliders_container = html.Div([
 
-    
-    dcc.Markdown("""
-                **Groupe**
+    dcc.Markdown(f"""
+                **Groupe {idx_groupe_courant}**
             """),
 
     dcc.Slider(
@@ -178,15 +195,15 @@ sliders_container = html.Div([
         persistence=True
     ),
 
-    dcc.Markdown("""
-                **Passager**
+    dcc.Markdown(f"""
+                **Passager {idx_passager_courant} du groupe courant**
             """),
 
     dcc.Slider(
         id="slider-passager",
         min=0,
         max=len(listeGroupes[idx_groupe_courant].list_passagers),
-        marks={idx: f'Passager {str(passager.idx)}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
+        # marks={idx: f'Passager {str(passager.idx)}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
         value=idx_passager_courant, # vaut 0 a priori au lancement
         disabled=True,
         persistence=True
@@ -203,17 +220,19 @@ scatter_plot = html.Div([
 ]) 
 
 
-# Component de debug pour afficher les infos du point sélectionné :
-debug_clickData = html.Div([
-           html.H5('Click Data')
-        ], className='three columns', id = 'click-data')
+# # Component de debug pour afficher les infos du point sélectionné :
+# debug_clickData = html.Div([
+#            html.H5('Click Data')
+#         ], className='three columns', id = 'click-data')
 
-debug_placements = html.Pre(id='debug-placements')
+# debug_placements = html.Pre(id='debug-placements')
 
-finished_phrase = html.Div([html.H3("Vous avez fini de placer les passegers!", style = {'color': '#990000', 'text-align':'center'}, id = 'finished-phrase') ])
+finished_phrase = html.H3(
+    "Vous avez fini de placer les passegers!", style = {'color': '#990000', 'text-align':'center'}, id = 'finished-phrase'
+)
 
 
-text_date = html.Div([html.H5('On regarde la date ' + date + ' l\'avion ' + AVION)], style = {'color': '#990000', 'text-align':'center'}, id = 'date')
+text_date = html.Div([html.H5(f"Airbus {AVION} / {date}")], style = {'color': '#990000', 'text-align':'center'}, id = 'date')
 
 
 ## ------ Defining Tab ------
@@ -237,17 +256,15 @@ tab_1_content = html.Div([
     text_date,
     sliders_container,
     scatter_plot,
-    debug_clickData,
+    # debug_clickData,
     confirm_button,
-    debug_placements,
+    # debug_placements,
     finished_phrase,
 
 ])
 
 tab_2_content = html.Div([
-    dcc.Markdown(f"""
-                **{date}_{AVION}**
-            """),
+    html.H5(f"Airbus {AVION} / {date}"),
     dcc.Graph(id="result-preview")
 ])
 
@@ -287,11 +304,11 @@ def render_content(tab):
 
 
 ## ------ Callbacks - Tab 1 ------
-@app.callback(
-    Output('click-data', 'children'),
-    Input('scatter-plot', 'clickData'))
-def display_click_data(clickData):
-    return json.dumps(clickData, indent=2)
+# @app.callback(
+#     Output('click-data', 'children'),
+#     Input('scatter-plot', 'clickData'))
+# def display_click_data(clickData):
+#     return json.dumps(clickData, indent=2)
 
 @app.callback(
     Output('confirm-button', 'disabled'),
@@ -300,7 +317,7 @@ def display_click_data(clickData):
 def is_point_selected(clickData):
     return clickData is None
 
-first_it = True #flag first it 
+# first_it = True #flag first it 
 
 @app.callback(
     [
@@ -309,13 +326,13 @@ first_it = True #flag first it
         # Output('slider-passager', 'marks'),
         Output('slider-groupe', 'value'),
         Output('scatter-plot', 'figure'),
-        Output('debug-placements', 'children'),
+        # Output('debug-placements', 'children'),
         Output('scatter-plot', 'clickData'),
         Output(component_id='div-sliders', component_property='style'),
         Output(component_id='confirm-button', component_property='style'),
         Output(component_id='scatter-plot', component_property='style'),
-        Output(component_id='debug-placements', component_property='style'),
-        Output(component_id='click-data', component_property='style'),
+        # Output(component_id='debug-placements', component_property='style'),
+        # Output(component_id='click-data', component_property='style'),
         Output(component_id='date', component_property='style'),
         Output(component_id='finished-phrase', component_property='style'),
         
@@ -390,11 +407,11 @@ def confirm_action(n_clicks, clickData):
 
 
 
-        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'none'}
-
+        # return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'none'}
+        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'none'}
     else:
-        return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}
-
+        # return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}
+        return 0, 0, 0, px.scatter(), None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block'}
 
 
 ## ------ Callbacks - Tab 2 ------
@@ -418,7 +435,10 @@ def update_preview(n_clicks):
     marker_list = get_markers_passagers(df_ans)
 
     ## --- Récupération de certaines métadonnées nécessaire à Plotly
-    with open('./'+AVION+'.json') as f:
+    extension = ""
+    if len([passager.id_passager for passager in listePassagers if passager.classe == "J"]) == 0:
+        extension = "_nb"
+    with open('./'+AVION+extension+'.json') as f:
         preprocess = json.load(f)
     
     avion = {
@@ -469,16 +489,18 @@ def update_preview(n_clicks):
     ## Ajout du barycentre
 
     # Couleur pour le point représentant le barycentre selon sa position
-    if avion['barycentre'][1] >= barycentre_x >= avion['barycentre'][0] and avion['barycentre'][3] >= barycentre_x >= avion['barycentre'][2]:
+    if avion['barycentre'][1] >= barycentre_x >= avion['barycentre'][0] and avion['barycentre'][3] >= barycentre_y >= avion['barycentre'][2]:
         color = "green"
+        legende_barycentre = "Barycentre"
     else:
         color = "red"
+        legende_barycentre = "Barycentre (non centré)"
 
     fig.add_trace(
         go.Scatter(x=[barycentre_x],
                 y=[barycentre_y],
-                name="Barycentre",
-                showlegend=False,
+                name=legende_barycentre,
+                showlegend=True,
                 marker_symbol=["star-triangle-up-dot"],
                 mode="markers",
                 marker=dict(size=20,
