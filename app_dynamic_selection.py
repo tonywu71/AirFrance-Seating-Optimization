@@ -19,6 +19,10 @@ from utils_dynamic import *
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.title = 'Projet Groupe 2 - AirFrance'
+
+# Car l'usage des tabs crée des components à chaque changement d'onglet :
+app.config['suppress_callback_exceptions']=True
 
 
 # TESTING PURPOSES
@@ -146,6 +150,7 @@ sliders_container = html.Div([
         marks={idx: f'{idx}'for idx in range(len(listeGroupes))  if idx % 10 == 0},
         value=idx_groupe_courant, # vaut 0 a priori au lancement
         disabled=True,
+        persistence=True
     ),
 
     dcc.Markdown("""
@@ -158,7 +163,8 @@ sliders_container = html.Div([
         max=len(listeGroupes[idx_groupe_courant].list_passagers),
         marks={idx: f'Passager {str(passager.idx)}'for idx, passager in enumerate(listeGroupes[idx_groupe_courant].list_passagers)},
         value=idx_passager_courant, # vaut 0 a priori au lancement
-        disabled=True
+        disabled=True,
+        persistence=True
     )
 ],  style = { 'width': '70%', 'margin-left': 'auto', 'margin-right': 'auto'})
 
@@ -184,8 +190,25 @@ debug_clickData = html.Div([
 debug_placements = html.Pre(id='debug-placements')
 
 
-## ------ Defining Layout ------
-app.layout = html.Div([
+
+## ------ Defining Tab ------
+tab_1 = dcc.Tab(
+                label='Sélection des places',
+                value='tab-1',
+                className='custom-tab',
+                selected_className='custom-tab--selected'
+            )
+
+tab_2 = dcc.Tab(
+                label='Prévisualisation',
+                value='tab-2',
+                className='custom-tab',
+                selected_className='custom-tab--selected'
+            )
+
+
+## ------ Defining Tab Contents ------
+tab_1_content = html.Div([
     div_header, # Banderolle de présentation du projet
 
     dcc.Markdown(f"""
@@ -198,11 +221,47 @@ app.layout = html.Div([
     debug_placements
 ])
 
+tab_2_content = html.Div([
+    dcc.Markdown(f"""
+                **{date}_{AVION}**
+            """),
+    dcc.Graph(id="result-preview")
+])
+
+
+## ------ Defining Layout ------
+app.layout = html.Div([
+    dcc.Tabs(
+        id="tabs-with-classes",
+        value='tab-1',
+        parent_className='custom-tabs',
+        className='custom-tabs-container',
+        children=[
+            tab_1,
+            tab_2
+        ],
+        persistence=True),
+
+    html.Div(id='tabs-content-classes', style={"justify-content": 'space-around'})
+])
 
 
 
 
 
+
+
+## ------ Callbacks (tabs) ------
+@app.callback(Output('tabs-content-classes', 'children'),
+              Input('tabs-with-classes', 'value'))
+def render_content(tab):
+    if tab == 'tab-1':
+        return tab_1_content
+    elif tab == 'tab-2':
+        return tab_2_content
+
+
+## ------ Callbacks - Tab 1 ------
 @app.callback(
     Output('click-data', 'children'),
     Input('scatter-plot', 'clickData'))
@@ -230,7 +289,6 @@ first_it = True #flag first it
     ],
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
-
 def confirm_action(n_clicks, clickData):
     global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, first_it
 
@@ -283,5 +341,96 @@ def confirm_action(n_clicks, clickData):
 
     return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None
 
+
+
+## ------ Callbacks - Tab 2 ------
+@app.callback(
+    Output("result-preview", "figure"), 
+    Input('confirm-button', 'n_clicks'))
+def update_preview(n_clicks):
+    print("update preview")
+
+    ## --- Récupération des données de l'instance sélectionnée dans le Dropdown ---
+    global date, AVION
+
+    ## --- Lecture du CSV ---
+    filename = f'solution_{date}_{AVION}.csv'
+    df_ans = pd.read_csv(os.path.join('output', filename))
+
+
+    ## --- Calcul du barycentre depuis df_ans directement
+    barycentre_x, barycentre_y = calcul_barycentre(df_ans)
+
+    ## --- Récupération des marqueurs pour le tracé dans Plotly
+    marker_list = get_markers_passagers(df_ans)
+
+    ## --- Récupération de certaines métadonnées nécessaire à Plotly
+    with open('./'+AVION+'.json') as f:
+        preprocess = json.load(f)
     
+    avion = {
+        'x_max': preprocess['x_max'],
+        'y_max': preprocess['y_max'],
+        'exit': preprocess['exit'],
+        'hallway': preprocess['hallway'],
+        'barycentre': preprocess['barycentre'],
+        'background': preprocess['background'],
+        'seats': {
+            'real': [],
+            'fictive': [],
+            'business': [],
+            'exit': [],
+            'eco': []        
+        }
+    }
+
+
+    ## --- Plot de la figure avec Plotly ---
+    fig = px.scatter(
+        df_ans,
+        x='x',
+        y='y',
+        hover_name='Siège',
+        color= 'ID Groupe',
+        size='Poids',
+        hover_data=df_ans.columns,
+        template="plotly_white",
+        color_continuous_scale=px.colors.diverging.RdBu)
+
+    
+
+    fig.update_traces(marker=dict(line=dict(width=2, color='black')),
+                    marker_symbol=marker_list,
+                    selector=dict(mode='markers'))
+
+    ## Ajout du barycentre
+    fig.add_trace(
+        go.Scatter(x=[barycentre_x],
+                y=[barycentre_y],
+                name="Barycentre",
+                showlegend=False,
+                marker_symbol=["star-triangle-up-dot"],
+                mode="markers",
+                marker=dict(size=20,
+                            color="green",
+                            line=dict(width=2, color='DarkSlateGrey'))))
+
+    fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
+
+
+    # Positionnement de la légende
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ))
+
+    # Add images
+    fig.add_layout_image(avion['background']) 
+    return fig
+
+
+
 app.run_server(debug=True)

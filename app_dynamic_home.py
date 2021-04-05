@@ -161,8 +161,9 @@ app.layout = html.Div([
     dcc.Textarea(
         id='textarea-debug',
         value='0'
+    )],
+    style={"justify-content": 'space-around'}
     )
-])
 
 
 
