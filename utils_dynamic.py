@@ -188,3 +188,99 @@ def placements_to_json(placements):
     print(placements)
     placements_new = {f"({str(key[0])}, {str(key[1])})": f"({str(val[0])}, {str(val[1])})" for key, val in placements.items()}
     return json.dumps(placements_new, indent=2)
+
+def coordToSiege(x, y, AVION):
+    gapRangee = 0
+    
+    if AVION == "A320":
+        
+        if x > 12:
+            gapRangee = 1
+            
+    elif AVION == "A321":
+        
+        if x >= 10 and x <= 13:
+            gapRangee = -1
+        elif x >= 24:
+            gapRangee = -1
+        
+    lettre = ""
+    if y == 1:
+        lettre = "A"
+    elif y == 2:
+        lettre = "B"
+    elif y == 3:
+        lettre = "C"
+    elif y == 5:
+        lettre = "D"
+    elif y == 6:
+        lettre = "E"
+    elif y == 7:
+        lettre = "F" 
+    return str(x+gapRangee)+lettre
+
+
+def placements_to_df(placements, date, AVION):
+    """Renvoie le DataFrame associé aux passagers déjà placé et avec
+    la même structure que celui déjà construit dans le modèle statique.
+
+    Args:
+        placements (dict)
+        date (string)
+        AVION (string)
+
+    Returns:
+        DataFrame
+    """
+    df_input = read_and_preprocess(date)
+
+    list_categories = ["Femmes", "Hommes", "Enfants", "WCHR"]
+    categorie_to_poids = {"Femmes": 65, "Hommes": 80, "Enfants": 35, "WCHR": 70}
+    data = []
+
+    if len(placements) == 0:
+        df_output = pd.DataFrame(columns=[
+            "ID Groupe",
+            "ID Passager",
+            "Catégorie",
+            "Classe",
+            "Transit Time",
+            "Poids",
+            "x",
+            "y",
+            "Siège"
+        ])
+
+    else:
+        for id_groupe, row in df_input.iterrows(): # Pour chaque ligne de notre instance de départ...
+            idx_passager = 0 # compte le numéro du passager dans le groupe
+            
+            for categorie in list_categories:
+                for _ in range(row[categorie]): # Pour chaque passager du groupe et pour chaque catégorie...
+                    
+                    if (id_groupe, idx_passager) in placements: # Si le passager en question a déjà été placé...
+                        # On récupère les coordonnées de la place choisie :
+                        x, y = placements[(id_groupe, idx_passager)]
+                        
+                        passager_dict = {
+                            "ID Groupe": id_groupe,
+                            "ID Passager": idx_passager,
+                            "Catégorie": categorie,
+                            "Classe": row["Classe"],
+                            "Transit Time": row["TransitTime"],
+                            "Poids": categorie_to_poids[categorie],
+                            "x": x,
+                            "y": y,
+                            "Siège": coordToSiege(x, y, AVION)
+                        }
+
+                        data.append(passager_dict)
+                    
+                    else:
+                        pass
+                        
+                    idx_passager += 1
+
+        df_output = pd.DataFrame.from_records(data)
+    
+    return df_output

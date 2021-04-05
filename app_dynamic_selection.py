@@ -9,7 +9,7 @@ import pandas as pd
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State
+from dash.dependencies import DashDependency, Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -232,7 +232,7 @@ tab_2_content = html.Div([
 ## ------ Defining Layout ------
 app.layout = html.Div([
     dcc.Tabs(
-        id="tabs-with-classes",
+        id="tabs",
         value='tab-1',
         parent_className='custom-tabs',
         className='custom-tabs-container',
@@ -253,7 +253,7 @@ app.layout = html.Div([
 
 ## ------ Callbacks (tabs) ------
 @app.callback(Output('tabs-content-classes', 'children'),
-              Input('tabs-with-classes', 'value'))
+              Input('tabs', 'value'))
 def render_content(tab):
     if tab == 'tab-1':
         return tab_1_content
@@ -346,20 +346,21 @@ def confirm_action(n_clicks, clickData):
 ## ------ Callbacks - Tab 2 ------
 @app.callback(
     Output("result-preview", "figure"), 
-    Input('confirm-button', 'n_clicks'))
+    Input('tabs', 'value'))
 def update_preview(n_clicks):
     print("update preview")
 
     ## --- Récupération des données de l'instance sélectionnée dans le Dropdown ---
-    global date, AVION
+    global placements, date, AVION
 
-    ## --- Lecture du CSV ---
-    filename = f'solution_{date}_{AVION}.csv'
-    df_ans = pd.read_csv(os.path.join('output', filename))
+    df_ans = placements_to_df(placements, date, AVION)
 
 
     ## --- Calcul du barycentre depuis df_ans directement
-    barycentre_x, barycentre_y = calcul_barycentre(df_ans)
+    if len(df_ans) == 0:
+        barycentre_x, barycentre_y =  18.5, 4
+    else:
+        barycentre_x, barycentre_y = calcul_barycentre(df_ans)
 
     ## --- Récupération des marqueurs pour le tracé dans Plotly
     marker_list = get_markers_passagers(df_ans)
@@ -384,24 +385,29 @@ def update_preview(n_clicks):
         }
     }
 
-
     ## --- Plot de la figure avec Plotly ---
-    fig = px.scatter(
-        df_ans,
-        x='x',
-        y='y',
-        hover_name='Siège',
-        color= 'ID Groupe',
-        size='Poids',
-        hover_data=df_ans.columns,
-        template="plotly_white",
-        color_continuous_scale=px.colors.diverging.RdBu)
+    if len(df_ans) == 0:
+        fig = px.scatter()
+    else:
+        fig = px.scatter(
+            df_ans,
+            x='x',
+            y='y',
+            hover_name='Siège',
+            color= 'ID Groupe',
+            size='Poids',
+            hover_data=df_ans.columns,
+            template="plotly_white",
+            color_continuous_scale=px.colors.diverging.RdBu)
 
-    
+
+    fig.update_xaxes(range=[0, 37])
+    fig.update_yaxes(range=[0.5, 7.5])
 
     fig.update_traces(marker=dict(line=dict(width=2, color='black')),
                     marker_symbol=marker_list,
                     selector=dict(mode='markers'))
+
 
     ## Ajout du barycentre
     fig.add_trace(
