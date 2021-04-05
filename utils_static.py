@@ -190,6 +190,8 @@ def get_list_groupes(df):
     """Renvoie un dictionnaire qui à chaque index de groupe
     renvoie un objet Groupe donnant sa composition.
     """
+    global numPassager
+
     listeGroupes = dict()
 
     for idx, row in df.iterrows():
@@ -201,9 +203,10 @@ def get_list_groupes(df):
             nb_enfants=row['Enfants'],
             nb_WCHR=row['WCHR'],
             classe=row['Classe'],
-            #transit_time=string_to_min(str(row['TransitTime']))
+            transit_time=string_to_min(str(row['TransitTime']))
         )
     
+    numPassager = 0 # Réinitialisation du compteur
     return listeGroupes
 
 def get_list_passagers(df):

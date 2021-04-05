@@ -2,15 +2,15 @@ import numpy as np
 import random as rd
 import re
 import json
+from numpy.lib.function_base import place
+from pandas.io.parsers import read_csv
 
 import plotly.express as px
 import plotly.graph_objects as go
 
 from utils_static import *
+from utils_dynamic_main import *
 
-
-# TODO pour l'avion
-# args: liste_groupes, liste_passagers, poids, top_left_corner
 
 def get_list_dates_input():
     """Renvoie la liste des dates des instances fournies dans le dossier "data".
@@ -68,13 +68,19 @@ def get_place_proposees_figure(places_proposees, AVION):
         }
     }
 
-
+    for seat_category in preprocess['seats'].keys():
+        for couple in preprocess['seats'][seat_category]:
+            x,y = couple[0], couple[1]
+            avion['seats'][seat_category].append((x,y))      
 
     ## --- Plot de la figure avec Plotly ---
-    fig = px.scatter(
-        x= [element[0] for element in places_proposees],
-        y= [element[1] for element in places_proposees]
-    )
+    if len(places_proposees) == 0:
+        fig = px.scatter()
+    else:
+        fig = px.scatter(
+            x= [element[0] for element in places_proposees],
+            y= [element[1] for element in places_proposees]
+        )
 
     fig.update_xaxes(range=[0, 37])
     fig.update_yaxes(range=[0.5, 7.5])
@@ -94,56 +100,128 @@ def get_place_proposees_figure(places_proposees, AVION):
     return fig
 
 
-## ----- Classes -----
-class Avion:
-    """
-    Une classe représentant un avion donné avec ses placements déjà réalisés.
-    """
-
-    def __init__(self, ref_avion, placements={}):
-        """Constructeur pour la classe Avion.
-
-        Args:
-            ref_avion (string): "A320" ou "A321"
-            placements (dict, optional): de la forme {id_passager: (x_place, y_place)}.
-        """
-        
-        self.ref_avion = ref_avion
-        self.placements = placements
-
-    def __str__(self):
-        return f'Avion #{self.ref_avion} avec {len(self.placements)} passager(s) déjà placés.'
-
-    def __repr__(self):
-        return f'avion #{self.ref_avion} - {len(self.placements)} passager(s) placés'
-    
-    def is_seat_free(self, place):
-        """Renvoie True si et seulement si la place donnée en entrée n'est pas déjà
-        occupée.
-        """
-        return not (place in self.placements)
-
-
-
 ## ----- Autres utilitaires -----
 
+
+
+
+def df_to_PI(df, avion):
+    """Renvoie un dictionnaire PI de même structure que la variable de décision PI
+    Gurobi.
+
+    Args:
+        df (DataFrame)
+
+    Returns:
+        PI (dict)
+    """
+
+    PI = dict()
+
+    list_x_possibles = list(range(avion["x_max"]+2))
+    list_y_possibles = list(range(avion["y_max"]+2))
+
+    for idx_passager, row in df.iterrows():
+
+
+        for x in list_x_possibles:
+            for y in list_y_possibles:
+                if (x, y) == (row["x"], row["y"]):
+                    PI[x, y, idx_passager] = 1
+                else:
+                    PI[x, y, idx_passager] = 0
+    
+    return PI
+
+def placements_to_PI_dynamique(placements, avion, date, AVION):
+    """Idem que df_to_PI mais avec un dictionnaire "placements" en entrée.
+
+    Args:
+        placements (DataFrame)
+
+    Returns:
+        PI_dynamique (dict)
+    """
+    PI_dynamique = dict()
+
+    list_x_possibles = list(range(avion["x_max"]+2))
+    list_y_possibles = list(range(avion["y_max"]+2))
+
+    for (id_groupe, idx_passager), (x_passager, y_passager) in placements.items():
+
+        for x in list_x_possibles:
+            for y in list_y_possibles:
+                if (x_passager, y_passager) == (x, y):
+                    PI_dynamique[x, y, get_id_passager(id_groupe, idx_passager, date, AVION)] = 1
+                else:
+                    PI_dynamique[x, y, get_id_passager(id_groupe, idx_passager, date, AVION)] = 0
+    
+    return PI_dynamique
+
+def get_id_passager(id_groupe, idx_passager, date, AVION):
+    """ Convertir la représentation (id_groupe, idx_passager) en
+    la clé unique (id_passager).
+    """
+
+    df = pd.read_csv(os.path.join("output", f"solution_{date}_{AVION}.csv"))
+    id_passager = df[df['ID Groupe'] == id_groupe].iloc[idx_passager]["ID Passager"]
+
+    return id_passager
+
+def placements_to_passager_places(placements, date, AVION):
+    return {get_id_passager(*key, date, AVION): val for key, val in placements.items()}
+
+
+
+
+
+
+
 # Finalement, on préférera shuffle directement dans l'instance pour faire des tests plus facilement.
-def get_positions_possibles(avion, groupe, idx_passager):
+def get_positions_possibles(id_groupe, idx_passager, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_options=10):
     """Pour une instance de l'avion (a priori déjà partiellement rempli),
     un groupe donné et un individu de ce groupe (identifié par son idx_passager),
     renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
     à ce même passager.
-    Args:
-        avion (Avion): instance de l'objet Avion à un certain temps t
-        groupe (Groupe): groupe où chercher le passager
-        idx_passager (int): identifiant du passager (dans le groupe)
     """
-    # Liste de tuples (x, y) donnant les coordonées des places proposées:
-    places_proposees = []
-    # TODO -> compléter la liste
-    places_proposees = get_dummy_places_proposees()
 
-    return places_proposees
+    print(placements)
+
+    # print(f"idx_passager = {idx_passager}")
+    existe_passager_place = (idx_passager > 0)
+
+    passager = listePassagers[get_id_passager(id_groupe, idx_passager, date, AVION)]
+    passager_places = placements_to_passager_places(placements, date, AVION)
+
+    print(f"passagers_places = {passager_places}")
+
+    if existe_passager_place: # Si on regarde un autre passager que le premier dans un groupe...
+        # intra groupe
+        switch_feasible = find_possible_switches_passager(passager, PI_dynamique, passager_places, avion, listePassagers, listeGroupes)
+        ALL_SEATS = {}
+        for i in range(min(limit_options,len(switch_feasible))):
+            x,y = switch_feasible[i][1]
+            ALL_SEATS[(x,y)] = switch_feasible[i][0]
+        
+    
+    else : # Si on regarde le 1er passage d'un groupe...
+        switch_feasible_inter_groupe = find_possible_switches(id_groupe, PI_dynamique, groupe_places, avion, listePassagers, listeGroupes)
+        ALL_SEATS = {}
+        for j in range(len(switch_feasible_inter_groupe)):
+            switch_feasible = find_possible_switches_passager(passager,switch_feasible_inter_groupe[j][0],passager_places, avion, listePassagers, listeGroupes)
+            
+            for i in range(min(limit_options,len(switch_feasible))):
+                x,y = switch_feasible[i][1]
+                ALL_SEATS[(x,y)] = switch_feasible[i][0]
+
+
+
+    #places_proposees = list(ALL_SEATS.keys())
+
+    # For debugging only !
+    # places_proposees = get_dummy_places_proposees()
+
+    return ALL_SEATS
 
 def get_dummy_places_proposees():
     places_proposees = []
@@ -185,9 +263,10 @@ def placements_to_json(placements):
     """Utilitaire pour avoir un dictionnaire avec des strings et non des tuples.
     Permet de debug.
     """
-    print(placements)
+    # print(placements)
     placements_new = {f"({str(key[0])}, {str(key[1])})": f"({str(val[0])}, {str(val[1])})" for key, val in placements.items()}
     return json.dumps(placements_new, indent=2)
+
 
 def coordToSiege(x, y, AVION):
     gapRangee = 0
