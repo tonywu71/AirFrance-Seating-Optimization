@@ -88,7 +88,7 @@ div_header = html.Div([
                     'width': '20%',
                     'position': 'absolute',
                     'right': '4%',
-                    'top': '19%',
+                    'top': '6%',
                 },
                 className="app__menu__img",
             )
@@ -104,7 +104,7 @@ div_header = html.Div([
                     'width': '13%',
                     'position': 'absolute',
                     'right': '85%',
-                    'top': '15%',
+                    'top': '2%',
                 },
                 className="app__menu__img",
             )
@@ -124,6 +124,7 @@ div_header = html.Div([
 
 # Bouton de confirmation du choix de la place :
 confirm_button = html.Button('Valider', id='confirm-button', type='submit', disabled=True)
+button_finished = html.Button('Regarder visualization finale!', type='submit', id='button-finished', disabled = False)
 
 
 sliders_container = html.Div([
@@ -199,7 +200,6 @@ tab_2 = dcc.Tab(
 
 ## ------ Defining Tab Contents ------
 tab_1_content = html.Div([
-    div_header, # Banderolle de présentation du projet
     
     text_date,
     sliders_container,
@@ -207,7 +207,7 @@ tab_1_content = html.Div([
     debug_clickData,
     confirm_button,
     debug_placements,
-    finished_phrase,
+    
 
 ])
 
@@ -221,6 +221,7 @@ tab_2_content = html.Div([
 
 ## ------ Defining Layout ------
 app.layout = html.Div([
+    div_header, # Banderolle de présentation du projet
     dcc.Tabs(
         id="tabs",
         value='tab-1',
@@ -232,12 +233,20 @@ app.layout = html.Div([
         ],
         persistence=True),
 
-    html.Div(id='tabs-content-classes', style={"justify-content": 'space-around'})
+    html.Div(id='tabs-content-classes', style={"justify-content": 'space-around'},),
+
+    html.Div([finished_phrase], style={ 'margin-left': '450px','verticalAlign': 'middle'}),
+    html.Div([button_finished,], style={'margin-left': '550px', 'margin-bottom': '10px','verticalAlign': 'middle'}),
+
+    html.Div([
+    dcc.Markdown(f"""
+                **{date}_{AVION}**
+            """),
+    dcc.Graph(id="finished-graph")
+
+], id = "finished-graph-holder", style = {'display': 'none'})
+
 ])
-
-
-
-
 
 
 
@@ -282,9 +291,11 @@ first_it = True #flag first it
         Output(component_id='debug-placements', component_property='style'),
         Output(component_id='click-data', component_property='style'),
         Output(component_id='date', component_property='style'),
+        Output(component_id='tabs', component_property='style'),
+        Output(component_id='tabs-content-classes', component_property='style'),
         Output(component_id='finished-phrase', component_property='style'),
-        
-        
+        Output(component_id='button-finished', component_property='style'),
+ 
     ],
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
@@ -338,10 +349,113 @@ def confirm_action(n_clicks, clickData):
 
 
 
-        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'none'}
+        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
 
     else:
-        return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}
+        return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'},{'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
+
+
+
+@app.callback(
+    [Output(component_id='finished-graph-holder', component_property='style'),
+     Output("finished-graph", "figure")], 
+    Input('button-finished', 'n_clicks')
+    )
+
+def display_finish_graph(n_clicks):
+
+    ## --- Récupération des données de l'instance sélectionnée dans le Dropdown ---
+    global placements, date, AVION
+
+    df_ans = placements_to_df(placements, date, AVION)
+
+
+    ## --- Calcul du barycentre depuis df_ans directement
+    if len(df_ans) == 0:
+        barycentre_x, barycentre_y =  18.5, 4
+    else:
+        barycentre_x, barycentre_y = calcul_barycentre(df_ans)
+
+    ## --- Récupération des marqueurs pour le tracé dans Plotly
+    marker_list = get_markers_passagers(df_ans)
+
+    ## --- Récupération de certaines métadonnées nécessaire à Plotly
+    with open('./'+AVION+'.json') as f:
+        preprocess = json.load(f)
+    
+    avion = {
+        'x_max': preprocess['x_max'],
+        'y_max': preprocess['y_max'],
+        'exit': preprocess['exit'],
+        'hallway': preprocess['hallway'],
+        'barycentre': preprocess['barycentre'],
+        'background': preprocess['background'],
+        'seats': {
+            'real': [],
+            'fictive': [],
+            'business': [],
+            'exit': [],
+            'eco': []        
+        }
+    }
+
+    ## --- Plot de la figure avec Plotly ---
+    if len(df_ans) == 0:
+        fig = px.scatter()
+    else:
+        fig = px.scatter(
+            df_ans,
+            x='x',
+            y='y',
+            hover_name='Siège',
+            color= 'ID Groupe',
+            size='Poids',
+            hover_data=df_ans.columns,
+            template="plotly_white",
+            color_continuous_scale=px.colors.diverging.RdBu)
+
+
+    fig.update_xaxes(range=[0, 37])
+    fig.update_yaxes(range=[0.5, 7.5])
+
+    fig.update_traces(marker=dict(line=dict(width=2, color='black')),
+                    marker_symbol=marker_list,
+                    selector=dict(mode='markers'))
+
+
+    ## Ajout du barycentre
+    fig.add_trace(
+        go.Scatter(x=[barycentre_x],
+                y=[barycentre_y],
+                name="Barycentre",
+                showlegend=False,
+                marker_symbol=["star-triangle-up-dot"],
+                mode="markers",
+                marker=dict(size=20,
+                            color="green",
+                            line=dict(width=2, color='DarkSlateGrey'))))
+
+    fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
+
+
+    # Positionnement de la légende
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ))
+
+    # Add images
+    fig.add_layout_image(avion['background']) 
+
+    if n_clicks is not None:
+        return {'display': 'block'}, fig
+    return{'display': 'none'}, fig
+ 
+
+
 
 
 
@@ -350,7 +464,6 @@ def confirm_action(n_clicks, clickData):
     Output("result-preview", "figure"), 
     Input('tabs', 'value'))
 def update_preview(n_clicks):
-    print("update preview")
 
     ## --- Récupération des données de l'instance sélectionnée dans le Dropdown ---
     global placements, date, AVION
