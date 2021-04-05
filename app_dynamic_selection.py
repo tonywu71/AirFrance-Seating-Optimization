@@ -403,7 +403,7 @@ def confirm_action(n_clicks, clickData):
     Input('tabs', 'value'))
 def update_preview(n_clicks):
     ## --- Récupération des données de l'instance sélectionnée dans le Dropdown ---
-    global placements, date, AVION
+    global placements, date, AVION, avion
 
     df_ans = placements_to_df(placements, date, AVION)
 
@@ -467,6 +467,13 @@ def update_preview(n_clicks):
 
 
     ## Ajout du barycentre
+
+    # Couleur pour le point représentant le barycentre selon sa position
+    if avion['barycentre'][1] >= barycentre_x >= avion['barycentre'][0] and avion['barycentre'][3] >= barycentre_x >= avion['barycentre'][2]:
+        color = "green"
+    else:
+        color = "red"
+
     fig.add_trace(
         go.Scatter(x=[barycentre_x],
                 y=[barycentre_y],
@@ -475,7 +482,7 @@ def update_preview(n_clicks):
                 marker_symbol=["star-triangle-up-dot"],
                 mode="markers",
                 marker=dict(size=20,
-                            color="green",
+                            color=color,
                             line=dict(width=2, color='DarkSlateGrey'))))
 
     fig.add_layout_image(source=f"cabine{AVION}AF.jpg")

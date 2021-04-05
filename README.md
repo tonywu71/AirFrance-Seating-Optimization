@@ -1,13 +1,15 @@
 # Projet AirFrance - Placement de Passagers
 Groupe 2 - Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Melkior, Tony Wu
 
-
+[TOC]
 
 ![image_presentation](assets/image_presentation.png)
 
 
 
-## Objectif
+## Partie 1
+
+### Objectif
 
 - Le projet vise à résoudre un problème d'optimisation visant à placer des passagers dans un avion de ligne de telle sorte à maximiser la satisfaction client tout en respectant un lot de consignes de sécurité obligatoires
 
@@ -19,7 +21,7 @@ Nous utiliserons pour cela le module *gurobi*.
 ​
 ​
 
-## Présentation
+### Présentation
 
 Pour ce problème, on considère principalement un avion <strong>Airbus A320</strong> de la compagnie <strong>Air France</strong> dont l'organisation intérieure est présentée sur l'image suivante :
 
@@ -39,7 +41,7 @@ La cabine de cet avion est un peu plus complexe et est composé de <strong>34 ra
 
 
 
-## Webapp pour visualiser les résultats
+### Webapp pour visualiser les résultats
 
 Nous avons également implémenté une Web Application avec *Dash* pour permettre de visualiser aisément les résultats obtenus. Pour l'utiliser, il faut :
 
@@ -53,7 +55,7 @@ Nous avons également implémenté une Web Application avec *Dash* pour permettr
 
 
 
-## Evaluation des performances de l'algorithme proposé
+### Evaluation des performances de l'algorithme proposé
 
 - Pour le critère de certificat d'optimalité, les résultats pour chaque instance sont automatiquement enregistrées dans le dossier `output`
 - Pour le critère de rapidité, les temps de calcul sont stockées dans le dossier `logs` dans des fichiers texte nommés avec le timestamp du moment où le calcul a été réalisé.
@@ -61,3 +63,48 @@ Nous avons également implémenté une Web Application avec *Dash* pour permettr
 
 
 Les temps de calcul obtenus lors de nos essais tournent autour de 2 secondes pour les petites instances et autour de 2 minutes pour les plus difficiles (sur nos ordinateurs portables).
+
+
+
+
+
+## Partie 2
+
+### Objectif
+
+### Présentation
+
+### Webapp
+
+### Evaluation des performances de l'algorithme proposé
+
+
+
+## Notes de version :
+
+- v2.0
+  - Release du 3ème rendu avec la partie dynamique
+  - **Cahier des charges pour la 2ème partie :**
+    - Offrir un maximum de choix de sièges
+    - Atteinte des objectifs de base
+    - Satisfaction client
+    - Centrage de l’avion
+    - Placement à l’avant des passagers en correspondance
+    - Respect des contraintes supplémentaires
+    - Placement spécial des passagers enfants, et des passagers à
+      mobilité réduire
+    - Ajout d’une cabine business
+
+- v1.1
+  - Ajout des images manquantes dans le Dash
+- 1.0
+  - Release du 2ème rendu avec la partie statique
+  - **Cahier des charges pour la 2ème partie :**
+    - Pas de choix de siège
+    - Atteinte des objectifs de base
+    - Satisfaction client
+    - Centrage de l’avion
+    - Placement à l’avant des passagers en correspondance
+    - Respect des contraintes supplémentaires
+    - Placement spécial des passagers enfants, et des passagers à mobilité réduire
+    - Ajout d’une cabine business
