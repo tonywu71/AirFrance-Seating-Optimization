@@ -276,7 +276,7 @@ def get_markers_passagers(df_ans):
     marker_list = []
 
     for idx, passager in df_ans.iterrows():
-        if passager["Classe"] == "Business":
+        if passager["Classe"] == "Business" or passager["Classe"] == 'J':
             dot = "-dot"
         else:
             dot = ""
@@ -286,7 +286,7 @@ def get_markers_passagers(df_ans):
             marker_list.append('hexagon'+dot)
         elif passager["Catégorie"] == "enfants":
             marker_list.append('star'+dot)   
-        elif passager["Catégorie"] == "WHCR":
+        elif passager["Catégorie"] == "WHCR" or passager["Catégorie"] == "WCHR":
             marker_list.append('star-square'+dot)
     
     return marker_list

@@ -344,7 +344,7 @@ def placements_to_df(placements, date, AVION):
                         passager_dict = {
                             "ID Groupe": id_groupe,
                             "ID Passager": idx_passager,
-                            "Catégorie": categorie,
+                            "Catégorie": categorie.lower() if categorie != 'WCHR' else categorie,
                             "Classe": row["Classe"],
                             "Transit Time": row["TransitTime"],
                             "Poids": categorie_to_poids[categorie],

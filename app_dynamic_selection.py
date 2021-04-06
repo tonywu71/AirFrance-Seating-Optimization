@@ -20,6 +20,13 @@ from utils_dynamic import *
 from app import app
 
 
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.title = 'Projet Groupe 2 - AirFrance'
+# Car l’usage des tabs crée des components à chaque changement d’onglet :
+app.config['suppress_callback_exceptions']=True
+
+
 # TESTING PURPOSES
 list_dates = get_list_dates_input()
 date = "17Nov"
@@ -159,29 +166,28 @@ div_header = html.Div([
 
 
 # Bouton de confirmation du choix de la place :
-confirm_button = html.Button('Valider', id='confirm-button', type='submit', disabled=True,
+confirm_button = html.Div([html.Button('Valider', id='confirm-button', type='submit', disabled=True,
     style={
+        'margin-left': '600px',
         'margin-bottom': '10px',
         'textAlign':'center',
         'width': '15%',
         'margin':'auto'}
-    )
+    )], style = {'margin-left': '650px', 'margin-bottom': '20px'}) 
 button_finished = html.Button('Regarder la visualisation finale', type='submit', id='button-finished', disabled = False)
 
 
 
 loading_spinner = html.Div(
     [
-        dcc.Loading(html.Div(id="loading-output"), color = '#000080'),
+        dcc.Loading(html.Div(id="loading-output"), color = '#000080')
     ]
 )
 
 
 sliders_container = html.Div([
 
-    dcc.Markdown(f"""
-                **Groupe {idx_groupe_courant}**
-            """),
+    dcc.Markdown(id = 'update-nombre-groupe'),
 
     dcc.Slider(
         id="slider-groupe",
@@ -193,9 +199,7 @@ sliders_container = html.Div([
         persistence=True
     ),
 
-    dcc.Markdown(f"""
-                **Passager {idx_passager_courant} du groupe courant**
-            """),
+    dcc.Markdown(id = 'update-nombre-passager'),
 
     dcc.Slider(
         id="slider-passager",
@@ -270,6 +274,7 @@ tab_1_content = html.Div([
     # debug_clickData,
     confirm_button,
     loading_spinner,
+    html.Div(style={"padding": "25px"}),
     # debug_placements,
     
 
@@ -277,12 +282,28 @@ tab_1_content = html.Div([
 
 tab_2_content = html.Div([
     html.H5(f"Airbus {AVION} / {date}"),
-    dcc.Graph(id="result-preview")
+    dcc.Graph(id="result-preview"),
+     html.Div(
+                    [
+                        html.Img(
+                            src=app.get_asset_url("legend-dynamique.png"),
+                            style={
+                                'width': '53%',
+                                'position': 'absolute',
+                                'left': '5%',
+                                'bottom': '8%',
+                            },
+                            className="app__menu__img",
+                        )
+                    ],
+                    className="app__header__logo",
+                ),
+
 ])
 
 
 ## ------ Defining Layout ------
-layout = html.Div([
+app.layout = html.Div([
     div_header, # Banderolle de présentation du projet
     dcc.Tabs(
         id="tabs",
@@ -341,6 +362,8 @@ def is_point_selected(clickData):
 @app.callback(
     [
         Output('slider-passager', 'value'),
+        Output('update-nombre-passager', 'children'),
+        Output('update-nombre-groupe', 'children'),
         Output('slider-passager', 'max'),
         # Output('slider-passager', 'marks'),
         Output('slider-groupe', 'value'),
@@ -364,7 +387,6 @@ def is_point_selected(clickData):
     State('scatter-plot', 'clickData'))
 def confirm_action(n_clicks, clickData):
     global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, finish, groupe_places, PI_dynamique, ALL_SEATS
-    
     
     if  idx_groupe_courant < len(listeGroupes) - 1:
         if n_clicks is not None:
@@ -427,12 +449,26 @@ def confirm_action(n_clicks, clickData):
         marks_slider_passager = {idx: f'Passager {str(passager.idx)}' for idx, passager in enumerate(listePassagers_courant)},
         # NB: On profite de regénérer la figure pour désélectionner le point précédent !
 
+        str_passager = f"""
+                **Passager {idx_passager_courant} du groupe courant**
+            """ 
 
+        str_groupe = f"""
+                **Groupe {idx_groupe_courant}**
+            """
 
-        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, None,'', {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
+        return idx_passager_courant,str_passager, str_groupe, max_slider_passager, idx_groupe_courant, fig, None,'', {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
 
     else:
-        return 0, 0, 0, px.scatter(), None, '', {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
+        str_passager = f"""
+                **Passager 0 du groupe courant**
+            """
+
+        str_groupe = f"""
+                **Groupe 0**
+            """
+
+        return 0, str_passager,str_groupe, 0, 0, px.scatter(), None, '', {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
 
 
 
@@ -458,6 +494,7 @@ def display_finish_graph(n_clicks):
 
     ## --- Récupération des marqueurs pour le tracé dans Plotly
     marker_list = get_markers_passagers(df_ans)
+    print(df_ans)
 
     ## --- Récupération de certaines métadonnées nécessaire à Plotly
     with open('./'+AVION+'.json') as f:
@@ -497,6 +534,8 @@ def display_finish_graph(n_clicks):
 
     fig.update_xaxes(range=[0, 37])
     fig.update_yaxes(range=[0.5, 7.5])
+
+     
 
     fig.update_traces(marker=dict(line=dict(width=2, color='black')),
                     marker_symbol=marker_list,
@@ -647,3 +686,7 @@ def update_preview(n_clicks):
     # Add images
     fig.add_layout_image(avion['background']) 
     return fig
+
+
+app.run_server(debug=True)
+
