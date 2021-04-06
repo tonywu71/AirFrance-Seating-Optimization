@@ -155,7 +155,8 @@ layout = html.Div([
 
     div_date, # Sélection de date
     div_avion, # Sélection de l'avion
-    confirm_button_1
+    # confirm_button_1
+    dcc.Link('Go to page', href = '/app_dynamic_selection')
     ],
     style={"justify-content": 'space-around'}
     )

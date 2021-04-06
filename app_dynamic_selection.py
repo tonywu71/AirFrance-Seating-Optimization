@@ -3,6 +3,8 @@
 import os
 import json
 import re
+import sys
+
 
 import pandas as pd
 
@@ -26,11 +28,12 @@ app.title = 'Projet Groupe 2 - AirFrance'
 # Car l'usage des tabs crée des components à chaque changement d'onglet :
 app.config['suppress_callback_exceptions']=True
 
+print(sys.argv)
 
 # TESTING PURPOSES
 list_dates = get_list_dates_input()
-date = "17Nov"
-AVION = "A321"
+date =  str(sys.argv[1]) 
+AVION = str(sys.argv[2])
 
 
 # Dicionnaire (global) qui à chaque id_passager associe la place choisie
@@ -227,19 +230,15 @@ scatter_plot = html.Div([
 ]) 
 
 
-# # Component de debug pour afficher les infos du point sélectionné :
-# debug_clickData = html.Div([
-#            html.H5('Click Data')
-#         ], className='three columns', id = 'click-data')
-
-# debug_placements = html.Pre(id='debug-placements')
-
 finished_phrase = html.H3(
     "Vous avez fini de placer les passagers!", style = {'color': '#990000', 'text-align':'center'}, id = 'finished-phrase'
 )
 
 
 text_date = html.Div([html.H5(f"Airbus {AVION} / {date}")], style = {'color': '#990000', 'text-align':'center'}, id = 'date')
+
+
+
 
 
 ## ------ Defining Tab ------
