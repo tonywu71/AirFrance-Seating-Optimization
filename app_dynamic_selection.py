@@ -12,7 +12,6 @@ import dash_html_components as html
 from dash.dependencies import DashDependency, Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
-import dash_bootstrap_components as dbc
 
 from utils_static import *
 from utils_dynamic import *
@@ -91,8 +90,19 @@ df_statique = pd.read_csv(os.path.join("output", f"solution_{date}_{AVION}.csv")
 PI_statique = df_to_PI(df_statique, avion)
 PI_dynamique = df_to_PI(df_statique, avion)
 
+# Autres variables utiles à initialiser :
+placement_dynamique = {} 
+
+# limit_return_intra = nombre de permutations qu'on autorise 'intra groupe'
+# limit_return_inter_groupe = nombre de permutations qu'on autorise 'inter groupe'
+# limit_return_inter_paquets = nombre de permutations qu'on autorise 'inter paquets'
+
+moyenne_tailles_groupes = build_df_frequences_size_groupes(date)
+limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(moyenne_tailles_groupes)
+
+
 # Récupération des données issues de la première itération
-ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
 places_proposees = list(ALL_SEATS.keys())
 fig = get_place_proposees_figure(places_proposees, AVION)
 
@@ -275,13 +285,14 @@ tab_2_content = html.Div([
                                 'width': '53%',
                                 'position': 'absolute',
                                 'left': '5%',
-                                'bottom': '8%',
+                                'bottom': '2%',
                             },
                             className="app__menu__img",
                         )
                     ],
                     className="app__header__logo",
                 ),
+        html.Div(style={"paddding": "15px"})
 
 ])
 
@@ -370,7 +381,7 @@ def is_point_selected(clickData):
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
 def confirm_action(n_clicks, clickData):
-    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, finish, groupe_places, PI_dynamique, ALL_SEATS
+    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, finish, groupe_places, PI_dynamique, ALL_SEATS, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
     
     if  idx_groupe_courant < len(listeGroupes) - 1:
         if n_clicks is not None:
@@ -408,7 +419,7 @@ def confirm_action(n_clicks, clickData):
                 idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
 
             
-            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
             places_proposees = list(ALL_SEATS.keys())
             # print(f"places_proposees = {places_proposees}")
 
@@ -418,7 +429,7 @@ def confirm_action(n_clicks, clickData):
 
 
         else:
-            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
             places_proposees = list(ALL_SEATS.keys())
             # print(f"places_proposees = {places_proposees}")
             placements_json = str()
