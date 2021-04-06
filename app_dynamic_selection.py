@@ -12,6 +12,7 @@ import dash_html_components as html
 from dash.dependencies import DashDependency, Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
+import dash_bootstrap_components as dbc
 
 from utils_static import *
 from utils_dynamic import *
@@ -162,6 +163,14 @@ confirm_button = html.Button('Valider', id='confirm-button', type='submit', disa
 button_finished = html.Button('Regarder visualization finale!', type='submit', id='button-finished', disabled = False)
 
 
+
+loading_spinner = html.Div(
+    [
+        dcc.Loading(html.Div(id="loading-output"), color = '#000080'),
+    ]
+)
+
+
 sliders_container = html.Div([
 
     
@@ -217,6 +226,18 @@ finished_phrase = html.Div([html.H3("Vous avez fini de placer les passegers!", s
 text_date = html.Div([html.H5('On regarde la date ' + date + ' l\'avion ' + AVION)], style = {'color': '#990000', 'text-align':'center'}, id = 'date')
 
 
+
+
+# @app.callback(
+#     Output("loading-output", "children"), [Input("loading-button", "n_clicks")]
+# )
+# def load_output(n):
+#     if n:
+#         time.sleep(1)
+#         return f"Output loaded {n} times"
+#     return "Output not reloaded yet"
+
+
 ## ------ Defining Tab ------
 tab_1 = dcc.Tab(
                 label='Sélection des places',
@@ -241,6 +262,7 @@ tab_1_content = html.Div([
     scatter_plot,
     debug_clickData,
     confirm_button,
+    loading_spinner,
     debug_placements,
     
 
@@ -320,6 +342,7 @@ first_it = True #flag first it
         Output('scatter-plot', 'figure'),
         Output('debug-placements', 'children'),
         Output('scatter-plot', 'clickData'),
+        Output("loading-output", "children"),
         Output(component_id='div-sliders', component_property='style'),
         Output(component_id='confirm-button', component_property='style'),
         Output(component_id='scatter-plot', component_property='style'),
@@ -401,10 +424,10 @@ def confirm_action(n_clicks, clickData):
 
 
 
-        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
+        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, placements_json, None,'', {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
 
     else:
-        return 0, 0, 0, px.scatter(), {}, None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'},{'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
+        return 0, 0, 0, px.scatter(), {}, None, '', {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'},{'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
 
 
 
