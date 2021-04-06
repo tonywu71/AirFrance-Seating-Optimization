@@ -16,10 +16,7 @@ import plotly.graph_objects as go
 from utils_static import *
 from utils_dynamic import *
 
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+from app import app
 
 
 
@@ -147,47 +144,19 @@ div_avion = html.Div([
 ])
 
 
+confirm_button_1 = html.Button(
+    id="confirm-button-1"
+)
 
 
 ## ------ Defining Layout ------
-app.layout = html.Div([
+layout = html.Div([
     div_header, # Banderolle de présentation du projet
 
     div_date, # Sélection de date
     div_avion, # Sélection de l'avion
-
-    html.Button('Valider', id='button-valider', n_clicks=0),
-
-    dcc.Textarea(
-        id='textarea-debug',
-        value='0'
-    )],
+    confirm_button_1
+    ],
     style={"justify-content": 'space-around'}
     )
 
-
-
-
-
-
-
-@app.callback(
-    Output("textarea-debug", "value"), 
-    [Input("button-valider", "n_clicks"), Input("date-dropdown", "value"), Input("avion-dropdown", "value")])
-def debug(n_clicks, date, avion):
-    return f"{n_clicks}, {date}, {avion}"
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-app.run_server(debug=True)
