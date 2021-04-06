@@ -101,7 +101,7 @@ placement_dynamique = {}
 # limit_return_intra = nombre de permutations qu'on autorise 'intra groupe'
 # limit_return_inter_groupe = nombre de permutations qu'on autorise 'inter groupe'
 # limit_return_inter_paquets = nombre de permutations qu'on autorise 'inter paquets'
-moyenne_tailles_groupes = fct_caio(pd.read_csv(os.path.join('data', 'data_seating_{date}.csv')))
+moyenne_tailles_groupes = (pd.read_csv(os.path.join('data', 'data_seating_{date}.csv')))
 limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(moyenne_tailles_groupes=)
 
 # Récupération des données issues de la première itération
