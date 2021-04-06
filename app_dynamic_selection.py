@@ -3,6 +3,8 @@
 import os
 import json
 import re
+import sys
+
 
 import pandas as pd
 
@@ -26,11 +28,12 @@ app.title = 'Projet Groupe 2 - AirFrance'
 # Car l’usage des tabs crée des components à chaque changement d’onglet :
 app.config['suppress_callback_exceptions']=True
 
+print(sys.argv)
 
 # TESTING PURPOSES
 list_dates = get_list_dates_input()
-date = "17Nov"
-AVION = "A321"
+date =  str(sys.argv[1]) 
+AVION = str(sys.argv[2])
 
 
 # Dicionnaire (global) qui à chaque id_passager associe la place choisie
