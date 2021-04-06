@@ -12,18 +12,18 @@ import dash_html_components as html
 from dash.dependencies import DashDependency, Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
-import dash_bootstrap_components as dbc
 
 from utils_static import *
 from utils_dynamic import *
 
-from app import app
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# app = dash.Dash(__name__)
 app.title = 'Projet Groupe 2 - AirFrance'
-# Car l’usage des tabs crée des components à chaque changement d’onglet :
+
+# Car l'usage des tabs crée des components à chaque changement d'onglet :
 app.config['suppress_callback_exceptions']=True
 
 
@@ -91,8 +91,18 @@ df_statique = pd.read_csv(os.path.join("output", f"solution_{date}_{AVION}.csv")
 PI_statique = df_to_PI(df_statique, avion)
 PI_dynamique = df_to_PI(df_statique, avion)
 
+
+# Autres variables utiles à initialiser :
+placement_dynamique = {} 
+
+# limit_return_intra = nombre de permutations qu'on autorise 'intra groupe'
+# limit_return_inter_groupe = nombre de permutations qu'on autorise 'inter groupe'
+# limit_return_inter_paquets = nombre de permutations qu'on autorise 'inter paquets'
+moyenne_tailles_groupes = fct_caio(pd.read_csv(os.path.join('data', 'data_seating_{date}.csv')))
+limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(moyenne_tailles_groupes=)
+
 # Récupération des données issues de la première itération
-ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
 places_proposees = list(ALL_SEATS.keys())
 fig = get_place_proposees_figure(places_proposees, AVION)
 
@@ -110,7 +120,7 @@ div_header = html.Div([
         [
             html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title", style = {'color': '#990000', 'text-align':'center'}),
             html.P(
-                dcc.Markdown( "Caio Iglesias, Thomas Melkior, Quentin Guilhot, Tony Wu, Thomas Bouquet"),
+                dcc.Markdown( " Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Melkior, Tony Wu"),
                 style={
                     'fontSize': 16,
                     'color': '#990000',
@@ -166,28 +176,21 @@ div_header = html.Div([
 
 
 # Bouton de confirmation du choix de la place :
-confirm_button = html.Div([html.Button('Valider', id='confirm-button', type='submit', disabled=True,
+confirm_button = html.Button('Valider', id='confirm-button', type='submit', disabled=True,
     style={
-        'margin-left': '600px',
         'margin-bottom': '10px',
         'textAlign':'center',
         'width': '15%',
         'margin':'auto'}
-    )], style = {'margin-left': '650px', 'margin-bottom': '20px'}) 
+    )
 button_finished = html.Button('Regarder la visualisation finale', type='submit', id='button-finished', disabled = False)
-
-
-
-loading_spinner = html.Div(
-    [
-        dcc.Loading(html.Div(id="loading-output"), color = '#000080')
-    ]
-)
 
 
 sliders_container = html.Div([
 
-    dcc.Markdown(id = 'update-nombre-groupe'),
+    dcc.Markdown(f"""
+                **Groupe {idx_groupe_courant}**
+            """),
 
     dcc.Slider(
         id="slider-groupe",
@@ -199,7 +202,9 @@ sliders_container = html.Div([
         persistence=True
     ),
 
-    dcc.Markdown(id = 'update-nombre-passager'),
+    dcc.Markdown(f"""
+                **Passager {idx_passager_courant} du groupe courant**
+            """),
 
     dcc.Slider(
         id="slider-passager",
@@ -237,18 +242,6 @@ finished_phrase = html.H3(
 text_date = html.Div([html.H5(f"Airbus {AVION} / {date}")], style = {'color': '#990000', 'text-align':'center'}, id = 'date')
 
 
-
-
-# @app.callback(
-#     Output("loading-output", "children"), [Input("loading-button", "n_clicks")]
-# )
-# def load_output(n):
-#     if n:
-#         time.sleep(1)
-#         return f"Output loaded {n} times"
-#     return "Output not reloaded yet"
-
-
 ## ------ Defining Tab ------
 tab_1 = dcc.Tab(
                 label='Sélection des places',
@@ -273,32 +266,14 @@ tab_1_content = html.Div([
     scatter_plot,
     # debug_clickData,
     confirm_button,
-    loading_spinner,
-    html.Div(style={"padding": "25px"}),
     # debug_placements,
-    
+    finished_phrase,
 
 ])
 
 tab_2_content = html.Div([
     html.H5(f"Airbus {AVION} / {date}"),
-    dcc.Graph(id="result-preview"),
-     html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("legend-dynamique.png"),
-                            style={
-                                'width': '53%',
-                                'position': 'absolute',
-                                'left': '5%',
-                                'bottom': '8%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
-
+    dcc.Graph(id="result-preview")
 ])
 
 
@@ -362,15 +337,12 @@ def is_point_selected(clickData):
 @app.callback(
     [
         Output('slider-passager', 'value'),
-        Output('update-nombre-passager', 'children'),
-        Output('update-nombre-groupe', 'children'),
         Output('slider-passager', 'max'),
         # Output('slider-passager', 'marks'),
         Output('slider-groupe', 'value'),
         Output('scatter-plot', 'figure'),
         # Output('debug-placements', 'children'),
         Output('scatter-plot', 'clickData'),
-        Output("loading-output", "children"),
         Output(component_id='div-sliders', component_property='style'),
         Output(component_id='confirm-button', component_property='style'),
         Output(component_id='scatter-plot', component_property='style'),
@@ -386,7 +358,8 @@ def is_point_selected(clickData):
     Input('confirm-button', 'n_clicks'),
     State('scatter-plot', 'clickData'))
 def confirm_action(n_clicks, clickData):
-    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, finish, groupe_places, PI_dynamique, ALL_SEATS
+    global placements, places_proposees, idx_groupe_courant, idx_passager_courant, date, AVION, finish, groupe_places, PI_dynamique, ALL_SEATS, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
+    
     
     if  idx_groupe_courant < len(listeGroupes) - 1:
         if n_clicks is not None:
@@ -424,7 +397,7 @@ def confirm_action(n_clicks, clickData):
                 idx_passager_courant = 0 # On réinitialise le compteur car on commence à explorer un nouveau groupe
 
             
-            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
             places_proposees = list(ALL_SEATS.keys())
             # print(f"places_proposees = {places_proposees}")
 
@@ -434,7 +407,7 @@ def confirm_action(n_clicks, clickData):
 
 
         else:
-            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique)
+            ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
             places_proposees = list(ALL_SEATS.keys())
             # print(f"places_proposees = {places_proposees}")
             placements_json = str()
@@ -449,26 +422,12 @@ def confirm_action(n_clicks, clickData):
         marks_slider_passager = {idx: f'Passager {str(passager.idx)}' for idx, passager in enumerate(listePassagers_courant)},
         # NB: On profite de regénérer la figure pour désélectionner le point précédent !
 
-        str_passager = f"""
-                **Passager {idx_passager_courant} du groupe courant**
-            """ 
 
-        str_groupe = f"""
-                **Groupe {idx_groupe_courant}**
-            """
 
-        return idx_passager_courant,str_passager, str_groupe, max_slider_passager, idx_groupe_courant, fig, None,'', {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
+        return idx_passager_courant, max_slider_passager, idx_groupe_courant, fig, None, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'},{'display': 'block'}, {'display': 'block'},{'display': 'none'}, {'display': 'none'}
 
     else:
-        str_passager = f"""
-                **Passager 0 du groupe courant**
-            """
-
-        str_groupe = f"""
-                **Groupe 0**
-            """
-
-        return 0, str_passager,str_groupe, 0, 0, px.scatter(), None, '', {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
+        return 0, 0, 0, px.scatter(), None, {'display': 'none'}, {'display': 'none'}, {'display': 'none'},{'display': 'none'},{'display': 'none'},{'display': 'none'}, {'display': 'block'}, {'display': 'block'}
 
 
 
@@ -494,7 +453,6 @@ def display_finish_graph(n_clicks):
 
     ## --- Récupération des marqueurs pour le tracé dans Plotly
     marker_list = get_markers_passagers(df_ans)
-    print(df_ans)
 
     ## --- Récupération de certaines métadonnées nécessaire à Plotly
     with open('./'+AVION+'.json') as f:
@@ -534,8 +492,6 @@ def display_finish_graph(n_clicks):
 
     fig.update_xaxes(range=[0, 37])
     fig.update_yaxes(range=[0.5, 7.5])
-
-     
 
     fig.update_traces(marker=dict(line=dict(width=2, color='black')),
                     marker_symbol=marker_list,
@@ -688,5 +644,5 @@ def update_preview(n_clicks):
     return fig
 
 
-app.run_server(debug=True)
 
+app.run_server(debug=True)

@@ -178,14 +178,16 @@ def placements_to_passager_places(placements, date, AVION):
 
 
 # Finalement, on préférera shuffle directement dans l'instance pour faire des tests plus facilement.
-def get_positions_possibles(id_groupe, idx_passager, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_options=10):
+def get_positions_possibles(id_groupe, idx_passager, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets, limit_options=10):
     """Pour une instance de l'avion (a priori déjà partiellement rempli),
     un groupe donné et un individu de ce groupe (identifié par son idx_passager),
     renvoie une liste de tuples (x, y) donnant les coordonées des places proposées
     à ce même passager.
     """
 
-    print(placements)
+    taille_groupe = listeGroupes[id_groupe].get_nombre_passagers()
+
+    # print(placements)
 
     # print(f"idx_passager = {idx_passager}")
     existe_passager_place = (idx_passager > 0)
@@ -193,11 +195,11 @@ def get_positions_possibles(id_groupe, idx_passager, date, AVION, listePassagers
     passager = listePassagers[get_id_passager(id_groupe, idx_passager, date, AVION)]
     passager_places = placements_to_passager_places(placements, date, AVION)
 
-    print(f"passagers_places = {passager_places}")
+    # print(f"passagers_places = {passager_places}")
 
     if existe_passager_place: # Si on regarde un autre passager que le premier dans un groupe...
         # intra groupe
-        switch_feasible = find_possible_switches_passager(passager, PI_dynamique, passager_places, avion, listePassagers, listeGroupes)
+        switch_feasible = find_possible_switches_passager(passager, PI_dynamique, passager_places, avion, listePassagers, listeGroupes, limit_return_intra)
         ALL_SEATS = {}
         for i in range(min(limit_options,len(switch_feasible))):
             x,y = switch_feasible[i][1]
@@ -205,14 +207,18 @@ def get_positions_possibles(id_groupe, idx_passager, date, AVION, listePassagers
         
     
     else : # Si on regarde le 1er passage d'un groupe...
-        switch_feasible_inter_groupe = find_possible_switches(id_groupe, PI_dynamique, groupe_places, avion, listePassagers, listeGroupes)
+        switch_feasible_paquets = permutation_paquets(PI_dynamique, id_groupe, groupe_places, avion, listePassagers, listeGroupes, taille_groupe, limit_return_inter_paquets)
         ALL_SEATS = {}
-        for j in range(len(switch_feasible_inter_groupe)):
-            switch_feasible = find_possible_switches_passager(passager,switch_feasible_inter_groupe[j][0],passager_places, avion, listePassagers, listeGroupes)
-            
-            for i in range(min(limit_options,len(switch_feasible))):
-                x,y = switch_feasible[i][1]
-                ALL_SEATS[(x,y)] = switch_feasible[i][0]
+
+        for l in range(len(switch_feasible_paquets)):
+            switch_feasible_inter_groupe = find_possible_switches(id_groupe, switch_feasible_paquets[l][0], groupe_places, avion, listePassagers, listeGroupes, limit_return_inter_groupe)
+
+            for j in range(len(switch_feasible_inter_groupe)):
+                switch_feasible = find_possible_switches_passager(passager,switch_feasible_inter_groupe[j][0],passager_places, avion, listePassagers, listeGroupes, limit_return_intra)
+                
+                for i in range(min(limit_options,len(switch_feasible))):
+                    x,y = switch_feasible[i][1]
+                    ALL_SEATS[(x,y)] = switch_feasible[i][0]
 
 
 
@@ -235,29 +241,6 @@ def get_dummy_places_proposees():
 
     return places_proposees
 
-
-def update_avion(avion, groupe, id_passager, place_choisie):
-    """À partir d'une première instance d'objet Avion, d'un groupe donné,
-    du passager qu'on traite et enfin de la place choisie par ce dernier,
-
-    Args:
-        avion (Avion): instance d'avion à l'étape précédente
-        groupe (Groupe): groupe où chercher le passager
-        id_passager (int): identifiant du passager (dans le groupe)
-        place_choisie ((int, int)): coordonnées x et y de la place choisie
-
-    
-    """
-    x, y = place_choisie
-
-    ## ----- Update de la place choisie en place occupée -----
-    # Etat de la place mis à occupé (dans le code pseudo-vide)
-    # TODO
-
-    ## ----- Update du barycentre -----
-    # TODO
-
-    return avion
 
 def placements_to_json(placements):
     """Utilitaire pour avoir un dictionnaire avec des strings et non des tuples.
@@ -363,3 +346,17 @@ def placements_to_df(placements, date, AVION):
         df_output = pd.DataFrame.from_records(data)
     
     return df_output
+
+def get_params_return_utils(moyenne_tailles_groupes, threshold=2):
+    """Permet d'avoir les paramètres de branching adaptés à chaque cas.
+    """
+    if moyenne_tailles_groupes <= 2:
+        limit_return_intra = 3
+        limit_return_inter_groupe = 3
+        limit_return_inter_paquets = 3
+    else:
+        limit_return_intra = 20
+        limit_return_inter_groupe = 20
+        limit_return_inter_paquets = 1
+
+    return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
