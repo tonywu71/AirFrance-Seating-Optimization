@@ -46,12 +46,12 @@ La cabine de cet avion est un peu plus complexe et est composé de <strong>34 ra
 Nous avons également implémenté une Web Application avec *Dash* pour permettre de visualiser aisément les résultats obtenus. Pour l'utiliser, il faut :
 
 > - Se mettre dans le répertoire `AirFrance-ST7`
-> - Lancer `app.py` avec par exemple dans le terminal en lançant `python app.py`
-> - Ouvrir dans un navigateur le lien affiché (commençant par *localhost*)
+> - Lancer `app.py` avec par exemple dans le terminal en lançant `python app_static.py`
+> - Ouvrir dans un navigateur le lien affiché dans le terminal (commençant par *localhost*)
 
 
 
-![preview_webapp](assets/preview_webapp.png)
+![preview_webapp](assets/statique_screen_preview.png)
 
 
 
@@ -74,7 +74,23 @@ Les temps de calcul obtenus lors de nos essais tournent autour de 2 secondes pou
 
 ### Présentation
 
-### Webapp
+### WebApp
+
+#### Démonstration
+
+![tuoriel_webapp](assets/tuoriel_webapp.gif)
+
+
+
+#### Placement des passagers
+
+![dynamique_screen_1](assets/dynamique_screen_1.png)
+
+#### Visualisation de l'instance en cours de complétion
+
+![dynamique_screen_2](assets/dynamique_screen_2.png)
+
+
 
 ### Evaluation des performances de l'algorithme proposé
 
