@@ -1,5 +1,6 @@
 import numpy as np
 import random as rd
+import pandas as pd
 import re
 import json
 from numpy.lib.function_base import place
@@ -360,3 +361,23 @@ def get_params_return_utils(moyenne_tailles_groupes, threshold=2):
         limit_return_inter_paquets = 1
 
     return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
+
+def build_df_frequences_size_groupes(date):
+
+    df = pd.readcsv('/data/data_seating_' + date + '.csv')
+
+    df['taille'] = df['Femmes'] + df['Hommes'] + df['Enfants'] + df['WCHR']
+
+    return df.groupby('taille')['Femmes'].count().mean()
+
+
+def build_table_all_instances(list_dates, build_df_frequences_size_groupes):
+
+    df = pd.DataFrame(columns = ['date', 'value'])
+
+    for date in list_dates:
+        value = build_df_frequences_size_groupes(date)
+        df_aux = pd.DataFrame({'date': [date], 'value': [value]})
+        df = pd.concat([df, df_aux], axis = 0)
+
+    return df
