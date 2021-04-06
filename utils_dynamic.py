@@ -348,23 +348,11 @@ def placements_to_df(placements, date, AVION):
     
     return df_output
 
-def get_params_return_utils(moyenne_tailles_groupes, threshold=2):
-    """Permet d'avoir les paramètres de branching adaptés à chaque cas.
-    """
-    if moyenne_tailles_groupes <= 2:
-        limit_return_intra = 3
-        limit_return_inter_groupe = 3
-        limit_return_inter_paquets = 3
-    else:
-        limit_return_intra = 20
-        limit_return_inter_groupe = 20
-        limit_return_inter_paquets = 1
 
-    return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
 
 def build_df_frequences_size_groupes(date):
 
-    df = pd.readcsv('/data/data_seating_' + date + '.csv')
+    df = pd.read_csv('./data/data_seating_' + date + '.csv')
 
     df['taille'] = df['Femmes'] + df['Hommes'] + df['Enfants'] + df['WCHR']
 
@@ -381,3 +369,18 @@ def build_table_all_instances(list_dates, build_df_frequences_size_groupes):
         df = pd.concat([df, df_aux], axis = 0)
 
     return df
+
+
+def get_params_return_utils(moyenne_tailles_groupes, threshold=10):
+    """Permet d'avoir les paramètres de branching adaptés à chaque cas.
+    """
+    if moyenne_tailles_groupes <= 2:
+        limit_return_intra = 3
+        limit_return_inter_groupe = 3
+        limit_return_inter_paquets = 3
+    else:
+        limit_return_intra = 20
+        limit_return_inter_groupe = 20
+        limit_return_inter_paquets = 1
+
+    return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets

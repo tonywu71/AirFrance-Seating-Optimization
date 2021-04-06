@@ -101,8 +101,10 @@ placement_dynamique = {}
 # limit_return_intra = nombre de permutations qu'on autorise 'intra groupe'
 # limit_return_inter_groupe = nombre de permutations qu'on autorise 'inter groupe'
 # limit_return_inter_paquets = nombre de permutations qu'on autorise 'inter paquets'
-moyenne_tailles_groupes = (pd.read_csv(os.path.join('data', 'data_seating_{date}.csv')))
-limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(moyenne_tailles_groupes=)
+
+
+moyenne_tailles_groupes = build_df_frequences_size_groupes(date)
+limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(moyenne_tailles_groupes)
 
 # Récupération des données issues de la première itération
 ALL_SEATS = get_positions_possibles(idx_groupe_courant, idx_passager_courant, date, AVION, listePassagers, listeGroupes, placements, groupe_places, avion, PI_dynamique, limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets)
