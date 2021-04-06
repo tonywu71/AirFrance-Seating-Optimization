@@ -489,7 +489,7 @@ def display_finish_graph(n_clicks):
 
     ## --- Récupération des marqueurs pour le tracé dans Plotly
     marker_list = get_markers_passagers(df_ans)
-    print(df_ans)
+    # print(df_ans)
 
     ## --- Récupération de certaines métadonnées nécessaire à Plotly
     with open('./'+AVION+'.json') as f:
