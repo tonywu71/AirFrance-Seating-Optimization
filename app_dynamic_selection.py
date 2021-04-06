@@ -222,13 +222,6 @@ scatter_plot = html.Div([
 ]) 
 
 
-# # Component de debug pour afficher les infos du point sélectionné :
-# debug_clickData = html.Div([
-#            html.H5('Click Data')
-#         ], className='three columns', id = 'click-data')
-
-# debug_placements = html.Pre(id='debug-placements')
-
 finished_phrase = html.H3(
     "Vous avez fini de placer les passagers!", style = {'color': '#990000', 'text-align':'center'}, id = 'finished-phrase'
 )
@@ -238,15 +231,6 @@ text_date = html.Div([html.H5(f"Airbus {AVION} / {date}")], style = {'color': '#
 
 
 
-
-# @app.callback(
-#     Output("loading-output", "children"), [Input("loading-button", "n_clicks")]
-# )
-# def load_output(n):
-#     if n:
-#         time.sleep(1)
-#         return f"Output loaded {n} times"
-#     return "Output not reloaded yet"
 
 
 ## ------ Defining Tab ------
