@@ -16,15 +16,7 @@ import plotly.graph_objects as go
 from utils_static import *
 from utils_dynamic import *
 
-
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-# app = dash.Dash(__name__)
-app.title = 'Projet Groupe 2 - AirFrance'
-
-# Car l'usage des tabs crée des components à chaque changement d'onglet :
-app.config['suppress_callback_exceptions']=True
+from app import app
 
 
 # TESTING PURPOSES
@@ -268,7 +260,7 @@ tab_2_content = html.Div([
 
 
 ## ------ Defining Layout ------
-app.layout = html.Div([
+layout = html.Div([
     div_header, # Banderolle de présentation du projet
     dcc.Tabs(
         id="tabs",
@@ -632,7 +624,3 @@ def update_preview(n_clicks):
     # Add images
     fig.add_layout_image(avion['background']) 
     return fig
-
-
-
-app.run_server(debug=True)
