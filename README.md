@@ -43,10 +43,12 @@ La cabine de cet avion est un peu plus complexe et est composé de <strong>34 ra
 
 ### Webapp pour visualiser les résultats
 
-Nous avons également implémenté une Web Application avec *Dash* pour permettre de visualiser aisément les résultats obtenus. Pour l'utiliser, il faut :
+Nous avons également implémenté une Web Application avec *Dash* pour permettre de visualiser aisément les résultats obtenus.
+
+Pour l'utiliser, il faut :
 
 > - Se mettre dans le répertoire `AirFrance-ST7`
-> - Lancer `app.py` avec par exemple dans le terminal en lançant `python app_static.py`
+> - Lancer `app_static.py` avec par exemple dans le terminal en lançant `python app_static.py`
 > - Ouvrir dans un navigateur le lien affiché dans le terminal (commençant par *localhost*)
 
 
@@ -89,6 +91,20 @@ Les temps de calcul obtenus lors de nos essais tournent autour de 2 secondes pou
 #### Visualisation de l'instance en cours de complétion
 
 ![dynamique_screen_2](assets/dynamique_screen_2.png)
+
+
+
+Pour utiliser le WebApp, il faut :
+
+> - Lancer au préalable `livrable_2.ipynb` avec la date et l'avion voulus pour générer la solution dans le dossier `output` (automatiquement généré après avoir lancer toutes les cellules)
+> - Se mettre dans le répertoire `AirFrance-ST7`
+> - Lancer `app_dynamic.py` **en donnant en argument la date et l'avion** par exemple dans le terminal en lançant la commande `python app_dynamic 17Nov A321.py`
+> - Ouvrir dans un navigateur le lien affiché dans le terminal (commençant par *localhost*)
+> - On arrive sur l'interface sur l'onglet *Sélection des places*
+> - Pour le passager indiqué par les deux sliders, sélectionner la place proposée en cliquant sur le point correspondant
+> - Cliquer sur valider et si affichage de l'animation de chargement, attendre qu'il disparaisse (indique la fin des calculs)
+> - Continuer ainsi de suite jusqu'à remplissage de l'avion
+> - Pendant le remplissage, il est possible d'aller dans l'onglet *Prévisualisation* pour observer les placements de passager déjà réalisés.
 
 
 
