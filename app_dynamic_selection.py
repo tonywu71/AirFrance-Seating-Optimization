@@ -582,6 +582,7 @@ def update_preview(n_clicks):
     global placements, date, AVION, avion
 
     df_ans = placements_to_df(placements, date, AVION)
+    df_ans = df_ans.astype({"Time Transit": str})
 
 
     ## --- Calcul du barycentre depuis df_ans directement
