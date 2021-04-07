@@ -653,16 +653,16 @@ def update_preview(n_clicks):
         color = "red"
         legende_barycentre = "Barycentre (non centré)"
 
-    fig.add_trace(
-        go.Scatter(x=[barycentre_x],
-                y=[barycentre_y],
-                name=legende_barycentre,
-                showlegend=True,
-                marker_symbol=["star-triangle-up-dot"],
-                mode="markers",
-                marker=dict(size=20,
-                            color=color,
-                            line=dict(width=2, color='DarkSlateGrey'))))
+    # fig.add_trace(
+    #     go.Scatter(x=[barycentre_x],
+    #             y=[barycentre_y],
+    #             name=legende_barycentre,
+    #             showlegend=True,
+    #             marker_symbol=["star-triangle-up-dot"],
+    #             mode="markers",
+    #             marker=dict(size=20,
+    #                         color=color,
+    #                         line=dict(width=2, color='DarkSlateGrey'))))
 
     fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
 
