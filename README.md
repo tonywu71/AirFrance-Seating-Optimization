@@ -9,7 +9,7 @@ Groupe 2 - Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Me
 
 ## Introduction
 
-Le projet présenté est un travail réalisé dans le cadre du cours d'Optimisation de Systèmes de Transport Passagers à CentraleSupélec.
+Le projet présenté est un travail réalisé dans le cadre du cours d'**Optimisation de Systèmes de Transport Passagers** à CentraleSupélec. Nous sommes arrivés en 1ère place parmi 16 groupes de 5 élèves chacun après un vote du jury et du public.
 
 Le *README* que vous lisez actuellement présente un bref aperçu de notre travail. Pour plus de détails, veuillez vous référer au rapport contenu dans le fichier `Rapport - Groupe 2.pdf`.
 
@@ -60,7 +60,7 @@ Afin d'imager la méthode d'optimisation que nous avons inventée, nous avons ch
 
   
 
-<img src="assets/mise_a_vide_principe.jpg" alt="mise_a_vide_principe" style="zoom:50%;" />
+<img src="assets/MSV_packed.png" alt="mise_a_vide_principe" style="zoom:40%;" />
 
 
 
