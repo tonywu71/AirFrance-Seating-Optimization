@@ -1,8 +1,6 @@
 # Projet AirFrance - Placement de Passagers
 Groupe 2 - Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Melkior, Tony Wu
 
-[TOC]
-
 ![image_presentation](assets/image_presentation.png)
 
 
