@@ -17,7 +17,6 @@ import plotly.graph_objects as go
 from utils_static import *
 from utils_dynamic import *
 
-
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = 'Projet Groupe 2 - AirFrance'
@@ -96,8 +95,8 @@ placement_dynamique = {}
 # limit_return_inter_groupe = nombre de permutations qu'on autorise 'inter groupe'
 # limit_return_inter_paquets = nombre de permutations qu'on autorise 'inter paquets'
 
-moyenne_tailles_groupes = build_df_frequences_size_groupes(date)
-limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(moyenne_tailles_groupes)
+# moyenne_tailles_groupes = build_df_frequences_size_groupes(date)
+limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets = get_params_return_utils(listeGroupes, idx_groupe_courant)
 
 
 # Récupération des données issues de la première itération
@@ -488,7 +487,7 @@ def display_finish_graph(n_clicks):
 
     ## --- Récupération des marqueurs pour le tracé dans Plotly
     marker_list = get_markers_passagers(df_ans)
-    print(df_ans)
+    # print(df_ans)
 
     ## --- Récupération de certaines métadonnées nécessaire à Plotly
     with open('./'+AVION+'.json') as f:
@@ -581,7 +580,6 @@ def update_preview(n_clicks):
     global placements, date, AVION, avion
 
     df_ans = placements_to_df(placements, date, AVION)
-    df_ans = df_ans.astype({"Time Transit": str})
 
 
     ## --- Calcul du barycentre depuis df_ans directement
@@ -683,4 +681,4 @@ def update_preview(n_clicks):
     return fig
 
 
-app.run_server(debug=False)
+app.run_server(debug=True)

@@ -174,6 +174,7 @@ def update_bar_chart(value):
     ## --- Lecture du CSV ---
     filename = f'solution_{date}_{AVION}.csv'
     df_ans = pd.read_csv(os.path.join('output', filename))
+    df_ans = df_ans.astype({"Transit Time": str}).replace({'inf': '∞'}, regex=True)
 
 
     ## --- Calcul du barycentre depuis df_ans directement
@@ -233,7 +234,7 @@ def update_bar_chart(value):
                             color="green",
                             line=dict(width=2, color='DarkSlateGrey'))))
 
-    fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
+    # fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
 
 
     # Positionnement de la légende
