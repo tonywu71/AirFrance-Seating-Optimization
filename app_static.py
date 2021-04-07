@@ -16,7 +16,8 @@ import plotly.graph_objects as go
 from utils_static import *
 
 
-app = dash.Dash(__name__)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 
 ## ------ Obtention de la liste des fichiers de sortie ------
@@ -35,7 +36,7 @@ for filename in os.listdir('output'):
         dates_avion[date] = avion
 
 # Test pour vérifier si on arrive ou non à récupérer des données
-assert len(dates_avion) != 0, "Pas de données correctes trouvées dans le dossier data !"
+assert len(dates_avion) != 0, 'Pas de données correctes trouvées dans le dossier "output" !'
 
 # On extrait les clés du dictionnaire dates_avion pour lire plus facilement les dates:
 list_dates = list(dates_avion.keys())
@@ -60,108 +61,107 @@ date_dropdown = dcc.Dropdown(
 
 app.layout = html.Div([
 
-html.Div(
-                    [
-                        html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title", style = {'color': '#990000', 'text-align':'center'}),
-                        html.P(
-                           dcc.Markdown( "Caio Iglesias, Thomas Melkior, Quentin Guilhot, Tony Wu, Thomas Bouquet"),
-                            style={
-                                'fontSize': 16,
-                                'color': '#990000',
-                                'text-align':'center'
-                            },
-                            className="app__header__title--grey",
-                        ),
-                    ],
-                    className="app__header__desc",
-
-                ),
-
-                html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("AirFrance_logo.png"),
-                            style={
-                                'width': '20%',
-                                'position': 'absolute',
-                                'right': '4%',
-                                'top': '6%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
-
-                html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("cs_logo.png"),
-                            style={
-                                'width': '13%',
-                                'position': 'absolute',
-                                'right': '85%',
-                                'top': '2%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
-
-                html.Div(
-                    
-                    style={"padding": "10px"}
-                    
-                ),
-
-        html.P(
-                    dcc.Markdown( "Visualisation des solutions optimales"),
-                    style={
-                        'fontSize': 30,
-                        'color': '#000099',
-                        'text-align': 'left'
-                    },
-                    className="app__header__title--grey",
-                ),
-
-        html.P(
-                dcc.Markdown( "Sélectionnez la date pour laquelle vous voulez regarder la solution ci-dessous : "),
+    html.Div(
+        [
+            html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title",
+                    style={'color': '#990000', 'text-align': 'center'}),
+            html.P(
+                dcc.Markdown(
+                    "Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Melkior, Tony Wu"),
                 style={
-                    'fontSize': 18,
-                    'color': 'black',
-                    'text-align': 'left'
+                    'fontSize': 16,
+                    'color': '#990000',
+                    'text-align': 'center'
                 },
                 className="app__header__title--grey",
             ),
-                
+        ],
+        className="app__header__desc",
+
+    ),
+
+    html.Div(
+        [
+            html.Img(
+                src=app.get_asset_url("AirFrance_logo.png"),
+                style={
+                    'width': '20%',
+                    'position': 'absolute',
+                    'right': '4%',
+                    'top': '6%',
+                },
+                className="app__menu__img",
+            )
+        ],
+        className="app__header__logo",
+    ),
+
+    html.Div(
+        [
+            html.Img(
+                src=app.get_asset_url("cs_logo.png"),
+                style={
+                    'width': '13%',
+                    'position': 'absolute',
+                    'right': '85%',
+                    'top': '2%',
+                },
+                className="app__menu__img",
+            )
+        ],
+        className="app__header__logo",
+    ),
+
+    html.Div(
+
+        style={"padding": "10px"}
+
+    ),
+
+    html.P(
+        dcc.Markdown("Visualisation des solutions optimales"),
+        style={
+            'fontSize': 30,
+            'color': '#000099',
+            'text-align': 'left'
+        },
+        className="app__header__title--grey",
+    ),
+
+    html.P(
+        dcc.Markdown(
+            "Sélectionnez la date pour laquelle vous voulez regarder la solution ci-dessous : "),
+        style={
+            'fontSize': 18,
+            'color': 'black',
+            'text-align': 'left'
+        },
+        className="app__header__title--grey",
+    ),
+
     date_dropdown,
-
-
-
-     html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("legend2.png"),
-                            style={
-                                'width': '53%',
-                                'position': 'absolute',
-                                'left': '5%',
-                                'bottom': '3%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
 
     dcc.Graph(id="scatter-plot"),
 
-      html.Div(
-                    
-                    style={"padding": "100px"}
-                    
-                ),
+    html.Div(
+        [
+            html.Img(
+                src=app.get_asset_url("legend2.png"),
+                style={
+                    'width': '53%',
+                    'position': 'absolute',
+                                'left': '5%',
+                                'bottom': '2%',
+                },
+                className="app__menu__img",
+            )
+        ],
+        className="app__header__logo",
+    ),
+
+    html.Div(
+        style={"padding": "15px"}
+    ),
 ])
 
 @app.callback(
@@ -174,6 +174,7 @@ def update_bar_chart(value):
     ## --- Lecture du CSV ---
     filename = f'solution_{date}_{AVION}.csv'
     df_ans = pd.read_csv(os.path.join('output', filename))
+    df_ans = df_ans.astype({"Transit Time": str}).replace({'inf': '∞'}, regex=True)
 
 
     ## --- Calcul du barycentre depuis df_ans directement
@@ -233,7 +234,7 @@ def update_bar_chart(value):
                             color="green",
                             line=dict(width=2, color='DarkSlateGrey'))))
 
-    fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
+    # fig.add_layout_image(source=f"cabine{AVION}AF.jpg")
 
 
     # Positionnement de la légende
@@ -244,72 +245,6 @@ def update_bar_chart(value):
         xanchor="right",
         x=1
     ))
-
-    
-
-    # ## Ajout des barres colorées pour visualiser les emplacements spécifiques de l'avion
-    # #Issues de Secours
-    # fig.add_shape(x0=10.5,
-    #             x1=12.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="red",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=10.5,
-    #             x1=12.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="red",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-
-    # #Classe Business
-    # fig.add_shape(x0=0.5,
-    #             x1=9.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="orange",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=0.5,
-    #             x1=9.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="orange",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-
-    # #Classe Economie
-    # fig.add_shape(x0=9.5,
-    #             x1=10.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=9.5,
-    #             x1=10.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=12.5,
-    #             x1=28.5,
-    #             y0=0.5,
-    #             y1=0.6,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-    # fig.add_shape(x0=12.5,
-    #             x1=28.5,
-    #             y0=7.4,
-    #             y1=7.5,
-    #             fillcolor="blue",
-    #             line=dict(width=0),
-    #             opacity=0.25)
-
 
     # Add images
     fig.add_layout_image(avion['background']) 
