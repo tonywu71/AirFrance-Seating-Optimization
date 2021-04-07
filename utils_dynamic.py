@@ -371,16 +371,34 @@ def build_table_all_instances(list_dates, build_df_frequences_size_groupes):
     return df
 
 
-def get_params_return_utils(moyenne_tailles_groupes, threshold=10):
+# def get_params_return_utils(moyenne_tailles_groupes, threshold=10):
+#     """Permet d'avoir les paramètres de branching adaptés à chaque cas.
+#     """
+#     if moyenne_tailles_groupes <= 2:
+#         limit_return_intra = 3
+#         limit_return_inter_groupe = 3
+#         limit_return_inter_paquets = 3
+#     else:
+#         limit_return_intra = 20
+#         limit_return_inter_groupe = 20
+#         limit_return_inter_paquets = 1
+
+#     return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
+
+def get_params_return_utils(listeGroupes, groupe):
     """Permet d'avoir les paramètres de branching adaptés à chaque cas.
     """
-    if moyenne_tailles_groupes <= 2:
+    taille_groupe = listeGroupes[groupe].get_nombre_passagers()
+    other_groupes_same_taille=0
+    for groupe2 in list(listeGroupes.keys()):
+        if listeGroupes[groupe2].get_nombre_passagers()==taille_groupe and groupe2!=groupe:
+            other_groupes_same_taille+=1
+    if other_groupes_same_taille <= 2:
         limit_return_intra = 3
-        limit_return_inter_groupe = 3
-        limit_return_inter_paquets = 3
+        limit_return_inter_groupe = 2
+        limit_return_inter_paquets = 5
     else:
-        limit_return_intra = 20
-        limit_return_inter_groupe = 20
+        limit_return_intra = 3
+        limit_return_inter_groupe = 5
         limit_return_inter_paquets = 1
-
     return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
