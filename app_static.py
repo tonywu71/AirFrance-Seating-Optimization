@@ -67,7 +67,7 @@ app.layout = html.Div([
                     style={'color': '#990000', 'text-align': 'center'}),
             html.P(
                 dcc.Markdown(
-                    "Caio Iglesias, Thomas Melkior, Quentin Guilhot, Tony Wu, Thomas Bouquet"),
+                    "Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Melkior, Tony Wu"),
                 style={
                     'fontSize': 16,
                     'color': '#990000',

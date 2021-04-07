@@ -118,7 +118,7 @@ div_header = html.Div([
         [
             html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title", style = {'color': '#990000', 'text-align':'center'}),
             html.P(
-                dcc.Markdown( "Caio Iglesias, Thomas Melkior, Quentin Guilhot, Tony Wu, Thomas Bouquet"),
+                dcc.Markdown( "Thomas Bouquet, Caio De Prospero Iglesias, Quentin Guilhot, Thomas Melkior, Tony Wu"),
                 style={
                     'fontSize': 16,
                     'color': '#990000',
