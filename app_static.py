@@ -139,7 +139,7 @@ html.Div(
 
 
 
-     html.Div(
+    html.Div(
                     [
                         html.Img(
                             src=app.get_asset_url("legend2.png"),
@@ -147,7 +147,7 @@ html.Div(
                                 'width': '53%',
                                 'position': 'absolute',
                                 'left': '5%',
-                                'bottom': '3%',
+                                'bottom': '2%',
                             },
                             className="app__menu__img",
                         )
@@ -157,11 +157,11 @@ html.Div(
 
     dcc.Graph(id="scatter-plot"),
 
-      html.Div(
-                    
-                    style={"padding": "100px"}
-                    
-                ),
+    html.Div(
+                
+                style={"padding": "15px"}
+                
+            ),
 ])
 
 @app.callback(

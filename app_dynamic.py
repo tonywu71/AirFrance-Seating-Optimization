@@ -293,7 +293,7 @@ tab_2_content = html.Div([
                     ],
                     className="app__header__logo",
                 ),
-    html.Div(style={"paddding": "15px"})
+        html.Div(style={"paddding": "15px"})
 
 ])
 
