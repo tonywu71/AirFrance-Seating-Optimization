@@ -395,10 +395,10 @@ def get_params_return_utils(listeGroupes, groupe):
             other_groupes_same_taille+=1
     if other_groupes_same_taille <= 2:
         limit_return_intra = 3
-        limit_return_inter_groupe = 3
-        limit_return_inter_paquets = 3
+        limit_return_inter_groupe = 2
+        limit_return_inter_paquets = 5
     else:
-        limit_return_intra = 20
-        limit_return_inter_groupe = 20
+        limit_return_intra = 3
+        limit_return_inter_groupe = 5
         limit_return_inter_paquets = 1
     return limit_return_intra, limit_return_inter_groupe, limit_return_inter_paquets
