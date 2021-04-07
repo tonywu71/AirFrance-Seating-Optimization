@@ -349,34 +349,34 @@ def feasible(PI, avion, listePassagers, listeGroupes):
     y_sup = -sum(passager.poids*y*PI[x,y,passager.id_passager] for x,y in avion['seats']['real'] for passager in listePassagers) + avion['barycentre'][3]*masseTotalePassagers
 
     if x_inf<0 or x_sup<0 or y_inf<0 or y_sup<0:
-        print("cas 1")
+        # print("cas 1")
         return False
 
     # sièges fictifs
     delta_fictif = sum(PI[x,y,passager.id_passager] for x,y in avion['seats']['fictive'] for passager in listePassagers)
 
     if delta_fictif!=0:
-        print("cas 2")
+        # print("cas 2")
         return False
 
     # au plus un passager par siège
 
     for x,y in avion['seats']['real']:
         if sum(PI[x,y,passager.id_passager] for passager in listePassagers) > 1:
-            print("cas 3")
+            # print("cas 3")
             return False
 
     # exactement un siège par passager
 
     for passager in listePassagers:
         if sum(PI[x,y,passager.id_passager] for x,y in avion['seats']['real']) != 1:
-            print("cas 4")
+            # print("cas 4")
             return False
 
     # pas d'enfant au niveau des issues de secours
 
     if sum(PI[x,y,passager.id_passager] for x,y in avion['seats']['exit'] for passager in listePassagers if passager.categorie == "enfants") != 0:
-        print("cas 5")
+        # print("cas 5")
         return False
 
      # pas d'enfant isolé
@@ -395,11 +395,11 @@ def feasible(PI, avion, listePassagers, listeGroupes):
                             voisinage = voisinage_lateral(x,y, avion)
                             if nombre_enfants > 2*nombre_adultes:
                                     if sum(PI[x, y+i, passager.id_passager] for i in voisinage for passager in listeGroupes[groupe].list_passagers if passager.id_passager != e) < PI[x, y, e]:
-                                        print("cas 6")
+                                        # print("cas 6")
                                         return False
                             else:
                                 if sum(PI[x, y+i, adulte.id_passager] for i in voisinage for adulte in listeGroupes[groupe].list_passagers if adulte.categorie != 'enfants') < PI[x, y, e]:
-                                    print("cas 7")
+                                    # print("cas 7")
                                     return False
 
     # pas de passager Business en classe économique
@@ -411,7 +411,7 @@ def feasible(PI, avion, listePassagers, listeGroupes):
     # pas de passager économique en classe Business
 
     if sum(PI[x,y,passager.id_passager] for x,y in avion['seats']['business'] for passager in listePassagers if passager.classe == "Y") != 0 :
-        print("cas 9")
+        # print("cas 9")
         return False
 
     # contraintes sur les wheelchaires
@@ -419,7 +419,7 @@ def feasible(PI, avion, listePassagers, listeGroupes):
     val_interdites_y = [1,3,5,7]
 
     if sum(PI[x,y,w.id_passager] for x,y in avion['seats']['real'] for w in listePassagers if w.categorie == 'WHCR' and y in val_interdites_y) != 0 :
-        print("cas 10")
+        # print("cas 10")
         return False
 
     for x,y in avion['seats']['real']:
@@ -427,7 +427,7 @@ def feasible(PI, avion, listePassagers, listeGroupes):
             for passager in listePassagers:
                 if passager.categorie == 'WHCR':
                     if sum((y == 2) * (PI[x,y+1,p.id_passager] + PI[x-1,y+1,p.id_passager]) + (y == 6) * (PI[x,y-1,p.id_passager] + PI[x-1,y-1,p.id_passager]) + PI[x-1,y,p.id_passager] for p in listePassagers if p.id_passager != passager.id_passager) > 3 * (1 - PI[x,y,passager.id_passager]):
-                        print("cas 11")
+                        # print("cas 11")
                         return False
 
     # contraintes pour les x_max,x_min etc
