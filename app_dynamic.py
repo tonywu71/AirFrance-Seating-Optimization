@@ -17,8 +17,6 @@ import plotly.graph_objects as go
 from utils_static import *
 from utils_dynamic import *
 
-from app import app
-
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)

@@ -16,7 +16,8 @@ import plotly.graph_objects as go
 from utils_static import *
 
 
-app = dash.Dash(__name__)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 
 ## ------ Obtention de la liste des fichiers de sortie ------
@@ -60,108 +61,107 @@ date_dropdown = dcc.Dropdown(
 
 app.layout = html.Div([
 
-html.Div(
-                    [
-                        html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title", style = {'color': '#990000', 'text-align':'center'}),
-                        html.P(
-                           dcc.Markdown( "Caio Iglesias, Thomas Melkior, Quentin Guilhot, Tony Wu, Thomas Bouquet"),
-                            style={
-                                'fontSize': 16,
-                                'color': '#990000',
-                                'text-align':'center'
-                            },
-                            className="app__header__title--grey",
-                        ),
-                    ],
-                    className="app__header__desc",
-
-                ),
-
-                html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("AirFrance_logo.png"),
-                            style={
-                                'width': '20%',
-                                'position': 'absolute',
-                                'right': '4%',
-                                'top': '6%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
-
-                html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("cs_logo.png"),
-                            style={
-                                'width': '13%',
-                                'position': 'absolute',
-                                'right': '85%',
-                                'top': '2%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
-
-                html.Div(
-                    
-                    style={"padding": "10px"}
-                    
-                ),
-
-        html.P(
-                    dcc.Markdown( "Visualisation des solutions optimales"),
-                    style={
-                        'fontSize': 30,
-                        'color': '#000099',
-                        'text-align': 'left'
-                    },
-                    className="app__header__title--grey",
-                ),
-
-        html.P(
-                dcc.Markdown( "Sélectionnez la date pour laquelle vous voulez regarder la solution ci-dessous : "),
+    html.Div(
+        [
+            html.H1("Projet AirFrance (ST7) - Groupe 2", className="app__header__title",
+                    style={'color': '#990000', 'text-align': 'center'}),
+            html.P(
+                dcc.Markdown(
+                    "Caio Iglesias, Thomas Melkior, Quentin Guilhot, Tony Wu, Thomas Bouquet"),
                 style={
-                    'fontSize': 18,
-                    'color': 'black',
-                    'text-align': 'left'
+                    'fontSize': 16,
+                    'color': '#990000',
+                    'text-align': 'center'
                 },
                 className="app__header__title--grey",
             ),
-                
-    date_dropdown,
+        ],
+        className="app__header__desc",
 
-
+    ),
 
     html.Div(
-                    [
-                        html.Img(
-                            src=app.get_asset_url("legend2.png"),
-                            style={
-                                'width': '53%',
-                                'position': 'absolute',
-                                'left': '5%',
-                                'bottom': '2%',
-                            },
-                            className="app__menu__img",
-                        )
-                    ],
-                    className="app__header__logo",
-                ),
+        [
+            html.Img(
+                src=app.get_asset_url("AirFrance_logo.png"),
+                style={
+                    'width': '20%',
+                    'position': 'absolute',
+                    'right': '4%',
+                    'top': '6%',
+                },
+                className="app__menu__img",
+            )
+        ],
+        className="app__header__logo",
+    ),
+
+    html.Div(
+        [
+            html.Img(
+                src=app.get_asset_url("cs_logo.png"),
+                style={
+                    'width': '13%',
+                    'position': 'absolute',
+                    'right': '85%',
+                    'top': '2%',
+                },
+                className="app__menu__img",
+            )
+        ],
+        className="app__header__logo",
+    ),
+
+    html.Div(
+
+        style={"padding": "10px"}
+
+    ),
+
+    html.P(
+        dcc.Markdown("Visualisation des solutions optimales"),
+        style={
+            'fontSize': 30,
+            'color': '#000099',
+            'text-align': 'left'
+        },
+        className="app__header__title--grey",
+    ),
+
+    html.P(
+        dcc.Markdown(
+            "Sélectionnez la date pour laquelle vous voulez regarder la solution ci-dessous : "),
+        style={
+            'fontSize': 18,
+            'color': 'black',
+            'text-align': 'left'
+        },
+        className="app__header__title--grey",
+    ),
+
+    date_dropdown,
 
     dcc.Graph(id="scatter-plot"),
 
     html.Div(
-                
-                style={"padding": "15px"}
-                
-            ),
+        [
+            html.Img(
+                src=app.get_asset_url("legend2.png"),
+                style={
+                    'width': '53%',
+                    'position': 'absolute',
+                                'left': '5%',
+                                'bottom': '2%',
+                },
+                className="app__menu__img",
+            )
+        ],
+        className="app__header__logo",
+    ),
+
+    html.Div(
+        style={"padding": "15px"}
+    ),
 ])
 
 @app.callback(
