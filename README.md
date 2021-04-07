@@ -15,7 +15,7 @@ Le *README* que vous lisez actuellement présente un bref aperçu de notre trava
 
 ## Partie 1
 
-### Objectif
+### Objectifs
 
 - Le projet vise à résoudre un problème d'optimisation visant à placer des passagers dans un avion de ligne de telle sorte à maximiser la satisfaction client tout en respectant un lot de consignes de sécurité obligatoires
 - Un second objectif est bien évidemment de résoudre le problème en un temps minimum.
