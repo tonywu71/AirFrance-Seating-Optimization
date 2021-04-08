@@ -143,7 +143,7 @@ Pour utiliser le WebApp associée au modèle dynamique, il faut :
 
 > - Lancer au préalable `livrable_2.ipynb` avec la date et l'avion voulus pour générer la solution dans le dossier `output` (automatiquement généré après avoir lancer toutes les cellules)
 > - Se mettre dans le répertoire `AirFrance-ST7`
-> - Lancer `app_dynamic.py` **en donnant en argument la date et l'avion** par exemple dans le terminal en lançant la commande `python app_dynamic 17Nov A321.py`
+> - Lancer `app_dynamic.py` **en donnant en argument la date et l'avion** par exemple dans le terminal en lançant la commande `python app_dynamic.py 17Nov A321`
 > - Ouvrir dans un navigateur le lien affiché dans le terminal (commençant par *localhost*)
 > - On arrive sur l'interface sur l'onglet *Sélection des places*
 > - Pour le passager indiqué par les deux sliders, sélectionner la place proposée en cliquant sur le point correspondant
